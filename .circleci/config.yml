@@ -1,0 +1,62 @@
+version: 2
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+    - image: circleci/node:10.15.0
+
+jobs:
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package-lock.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Configure registry auth
+          # Alternative for public packages via npmjs registry:
+          # command: echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/repo/.npmrc
+          command: echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" >> ~/repo/.npmrc
+      - run: npm ci
+      - run: npm run ci:update-version
+      - run:
+          name: Run tests
+          command: npm run build
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package-lock.json" }}
+      - persist_to_workspace:
+          root: ~/repo
+          paths: .
+  deploy:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Publish package
+          command: npm publish
+          # Alternative to publish every master build with the `next` tag.
+          # Change the workflow below to deploy on master too via `only: master`
+          #command: npm publish $(if [ -z "$CIRCLE_TAG" ]; then echo "--tag next"; fi)
+
+workflows:
+  version: 2
+  test-deploy:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - deploy:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
