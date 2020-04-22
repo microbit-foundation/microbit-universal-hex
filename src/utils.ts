@@ -1,7 +1,10 @@
+export function byteToHexStr(byte: number) {
+  return byte.toString(16).padStart(2, '0');
+}
+
 export function byteArrayToHexStr(byteArray: Uint8Array): string {
   return byteArray.reduce(
-    (accumulator, current) =>
-      accumulator + current.toString(16).padStart(2, '0'),
+    (accumulator, current) => accumulator + byteToHexStr(current),
     ''
   );
 }
