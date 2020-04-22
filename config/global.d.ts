@@ -14,6 +14,16 @@ declare module 'rollup-plugin-sourcemaps' {
   export default plugin;
 }
 
+declare module 'rollup-plugin-babel' {
+  export interface Options {
+    presets?: string | (string | object)[][];
+    sourceType?: string;
+    ignore?: RegExp[];
+  }
+  const plugin: RollupPluginImpl<Options>;
+  export default plugin;
+}
+
 // =====================∫
 // missing library types
 // =====================
