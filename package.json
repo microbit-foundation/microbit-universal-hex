@@ -1,20 +1,25 @@
 {
-  "name": "@microbit-foundation/typescript-library-starter",
+  "name": "@microbit-foundation/microbit-fb",
   "version": "0.1.0",
-  "description": "TypeScript library starter",
-  "keywords": [],
+  "description": "Create micro:bit fat binaries.",
+  "keywords": [
+    "microbit",
+    "fat-binary",
+    "fat binary",
+    "fb"
+  ],
   "main": "./dist/bundles/index.umd.js",
   "module": "./dist/esm5/index.js",
   "typings": "./dist/types/index.d.ts",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/microbit-foundation/typescript-library-starter"
+    "url": "https://github.com/microbit-foundation/microbit-fb"
   },
   "config": {
-    "umdName": "TypescriptLibraryStarter"
+    "umdName": "microbitFb"
   },
-  "author": "Matt Hillsdon <matt.hillsdon@microbit.org>",
+  "author": "Micro:bit Educational Foundation <package-help@microbit.org>",
   "license": "MIT",
   "engines": {
     "node": ">=8.5",
@@ -27,7 +32,7 @@
     "build": "tsc && rollup -c config/rollup.config.js",
     "test": "jest -c ./config/jest.config.js",
     "test:watch": "npm t -- --watch",
-    "test:coverage": "npm t -- --coverage",
+    "test:coverage": "npm t -- --verbose --coverage",
     "test:ci": "npm t -- --ci",
     "validate-js": "tsc -p ./config",
     "verify": "npm run validate-js && npm run style && npm run test:ci",
