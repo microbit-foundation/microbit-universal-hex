@@ -4,6 +4,7 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
 import commonjs from '@rollup/plugin-commonjs';
 import babel from 'rollup-plugin-babel';
+import minify from 'rollup-plugin-babel-minify';
 
 import pkg from '../package.json';
 
@@ -49,7 +50,7 @@ const plugins = /** @type {Plugin[]} */ ([
           targets: {
             // To check what's covered: https://browserl.ist
             browsers: [
-              '>10%',
+              '>0.1%',
               'ie>=11',
               'not ie<11',
               'not ios_saf<10',
@@ -67,20 +68,40 @@ const plugins = /** @type {Plugin[]} */ ([
 ]);
 
 /**
- * @type {Config}
+ * @param {{outputFile: string, extraPlugins?: Plugin[]}} options
  */
-const umdConfig = {
+const createUmdConfig = ({ outputFile, extraPlugins }) => ({
   inlineDynamicImports: true,
   external,
   // Start with esm5 (es5 with import/export)
   input: resolve(dist, 'esm5', 'index.js'),
   output: {
-    file: pkg.main,
+    file: outputFile,
     format: 'umd',
     name: pkg.config.umdName,
     sourcemap: true,
   },
-  plugins,
-};
+  plugins: [...plugins, ...(extraPlugins || [])],
+});
 
-export default [umdConfig];
+/**
+ * @type object
+ */
+const umdConfig = createUmdConfig({
+  outputFile: pkg.main,
+});
+
+/**
+ * @type object
+ */
+const umdConfigMin = createUmdConfig({
+  outputFile: pkg.mainMin,
+  extraPlugins: [
+    minify({
+      comments: false,
+      sourceMap: true,
+    }),
+  ],
+});
+
+export default [umdConfig, umdConfigMin];

@@ -9,6 +9,7 @@
     "fb"
   ],
   "main": "./dist/bundles/index.umd.js",
+  "mainMin": "./dist/bundles/index.umd.min.js",
   "module": "./dist/esm5/index.js",
   "typings": "./dist/types/index.d.ts",
   "sideEffects": false,
@@ -62,6 +63,7 @@
     "prettier": "^2.0.4",
     "rollup": "^2.6.1",
     "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-babel-minify": "^10.0.0",
     "rollup-plugin-sourcemaps": "^0.5.0",
     "shx": "^0.3.2",
     "ts-jest": "^25.3.1",

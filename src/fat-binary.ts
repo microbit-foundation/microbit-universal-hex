@@ -1,12 +1,12 @@
-import { createRecord, RecordType, endOfFileRecord } from './ihex';
+import * as ihex from './ihex';
 
-function startRecord(boardId: number): string {
+function createStartRecord(boardId: number): string {
   if (boardId < 0 || boardId > 0xffff) {
     throw new Error('Board ID out of range.');
   }
-  return createRecord(
+  return ihex.createRecord(
     0,
-    RecordType.BlockStart,
+    ihex.RecordType.BlockStart,
     new Uint8Array([boardId >> 8, boardId && 0xff, 0xc0, 0xde])
   );
 }
@@ -20,7 +20,21 @@ function startRecord(boardId: number): string {
  * @returns New Intel Hex string with the custom format.
  */
 function iHexToCustomFormat(iHexStr: string, boardId: number): string {
-  const start = startRecord(boardId);
+  const startRecord = createStartRecord(boardId);
+  // const endRecord = createEndRecord();
+  const hexLines = iHexStr.split('\r\n');
+
+  const blockLines = [];
+  // First we need to check if the first line is an extended linear record
+  blockLines.push(
+    ihex.getRecordType(hexLines[0]) === ihex.RecordType.ExtendedLinearAddress
+      ? hexLines[0]
+      : ihex.extLinAddressRecord(0)
+  );
+  blockLines.push(startRecord);
+
+  // for (let currentLine = 0; currentLine < hexLines.length; currentLine++) {}
+
   return '';
 }
 

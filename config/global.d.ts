@@ -23,6 +23,11 @@ declare module 'rollup-plugin-babel' {
   const plugin: RollupPluginImpl<Options>;
   export default plugin;
 }
+declare module 'rollup-plugin-babel-minify' {
+  export interface Options {}
+  const plugin: RollupPluginImpl<Options>;
+  export default plugin;
+}
 
 // =====================∫
 // missing library types
