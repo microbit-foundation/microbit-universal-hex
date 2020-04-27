@@ -239,3 +239,19 @@ describe('Test blockStartRecord()', () => {
     }).toThrow('Board ID out of range');
   });
 });
+
+describe('Test convertRecordToCustomData()', () => {
+  it('Converts a Data Record into a Custom Data Record', () => {
+    expect(
+      ihex.convertRecordToCustomData(
+        ':105D3000E060E3802046FFF765FF0123A1881A4653'
+      )
+    ).toEqual(':105D300DE060E3802046FFF765FF0123A1881A4646');
+
+    expect(
+      ihex.convertRecordToCustomData(
+        ':10B04000D90B08BD40420F0070B5044616460D46A8'
+      )
+    ).toEqual(':10B0400DD90B08BD40420F0070B5044616460D469B');
+  });
+});

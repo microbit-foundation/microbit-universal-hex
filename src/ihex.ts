@@ -134,7 +134,7 @@ function validateRecord(iHexRecord: string): boolean {
 /**
  * Retrieves the Record Type form an Intel Hex record line.
  *
- * @param iHexRecord A single Intel Hex record.
+ * @param iHexRecord Intel hex record line without line terminator.
  * @returns The RecordType value.
  */
 function getRecordType(iHexRecord: string): RecordType {
@@ -159,7 +159,7 @@ function getRecordType(iHexRecord: string): RecordType {
 /**
  * Parses an Intel Hex record into an Record object with its respective fields.
  *
- * @param iHexRecord Intel hex record line.
+ * @param iHexRecord Intel hex record line without line terminator.
  * @returns New object with the Record interface.
  */
 function parseRecord(iHexRecord: string): Record {
@@ -234,6 +234,12 @@ function extLinAddressRecord(address: number): string {
   );
 }
 
+/**
+ * Creates a Block Start (custom) Intel Hex Record.
+ *
+ * @param boardId Board ID to embed into the record, 0 to 0xFFF.
+ * @returns A Block Start (custom) Intel Hex record.
+ */
 function blockStartRecord(boardId: number): string {
   if (boardId < 0 || boardId > 0xffff) {
     throw new Error('Board ID out of range when creating Block Start record.');
@@ -245,6 +251,20 @@ function blockStartRecord(boardId: number): string {
   );
 }
 
+/**
+ * Changes the record type of a Record to a Custom Data type.
+ *
+ * The data field is kept, but changing the record type will trigger the
+ * checksum to be updated as well.
+ *
+ * @param iHexRecord Intel hex record line without line terminator.
+ * @returns A Custom Data Intel Hex record with the same data field.
+ */
+function convertRecordToCustomData(iHexRecord: string): string {
+  const record = parseRecord(iHexRecord);
+  return createRecord(record.address, RecordType.CustomData, record.data);
+}
+
 export {
   RecordType,
   createRecord,
@@ -253,4 +273,5 @@ export {
   endOfFileRecord,
   extLinAddressRecord,
   blockStartRecord,
+  convertRecordToCustomData,
 };
