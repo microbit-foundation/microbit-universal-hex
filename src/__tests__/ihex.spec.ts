@@ -112,6 +112,96 @@ describe('Test getRecordType() for custom records', () => {
   // TODO: Add tests for the OtherData record
 });
 
+describe('Test parseRecord() for standard records', () => {
+  it('Parses data records of different lengths', () => {
+    let result = ihex.parseRecord(
+      ':10FFF0009B6D9847A06810F039FF0621A06810F0AB'
+    );
+    expect(result.byteCount).toEqual(0x10);
+    expect(result.address).toEqual(0xfff0);
+    expect(result.recordType).toEqual(0x00);
+    expect(result.data).toEqual(
+      new Uint8Array([
+        0x9b,
+        0x6d,
+        0x98,
+        0x47,
+        0xa0,
+        0x68,
+        0x10,
+        0xf0,
+        0x39,
+        0xff,
+        0x06,
+        0x21,
+        0xa0,
+        0x68,
+        0x10,
+        0xf0,
+      ])
+    );
+    expect(result.checksum).toEqual(0xab);
+
+    result = ihex.parseRecord(':08AEE0007C53FF7F010000001C');
+    expect(result.byteCount).toEqual(0x08);
+    expect(result.address).toEqual(0xaee0);
+    expect(result.recordType).toEqual(0x00);
+    expect(result.data).toEqual(
+      new Uint8Array([0x7c, 0x53, 0xff, 0x7f, 0x01, 0x00, 0x00, 0x00])
+    );
+    expect(result.checksum).toEqual(0x1c);
+
+    result = ihex.parseRecord(':04F870000000000094');
+    expect(result.byteCount).toEqual(0x04);
+    expect(result.address).toEqual(0xf870);
+    expect(result.recordType).toEqual(0x00);
+    expect(result.data).toEqual(new Uint8Array([0x00, 0x00, 0x00, 0x00]));
+    expect(result.checksum).toEqual(0x94);
+  });
+
+  it('Parses data records of different lengths', () => {
+    const result = ihex.parseRecord(':04F870000000000094\r\n');
+    expect(result.byteCount).toEqual(0x04);
+    expect(result.address).toEqual(0xf870);
+    expect(result.recordType).toEqual(0x00);
+    expect(result.data).toEqual(new Uint8Array([0x00, 0x00, 0x00, 0x00]));
+    expect(result.checksum).toEqual(0x94);
+  });
+
+  it('Throws error when record does not start with a colon', () => {
+    expect(() => {
+      ihex.parseRecord('04F870000000000094');
+    }).toThrow('does not start with a ":"');
+  });
+
+  it('Throws error when record does not have the even hex characters', () => {
+    expect(() => {
+      ihex.parseRecord(':04F87000000000094');
+    }).toThrow('not divisible by 2');
+  });
+
+  it('Throws error when record is larger than indicated by byte count', () => {
+    expect(() => {
+      ihex.parseRecord(':04F87000000000009400');
+    }).toThrow('byte count');
+  });
+
+  // TODO: Add tests for parsing EoF records
+  // TODO: Add tests for parsing ExtendedSegmentAddress records
+  // TODO: Add tests for parsing StartSegmentAddress records
+  // TODO: Add tests for parsing ExtendedLinearAddress records
+  // TODO: Add tests for parsing StartLinearAddress records
+  // TODO: Add tests for parsing BlockStart records
+});
+
+describe('Test parseRecord() for standard records', () => {
+  // TODO: Add tests for parsing BlockStart records
+  // TODO: Add tests for parsing BlockEnd records
+  // TODO: Add tests for parsing PaddedData records
+  // TODO: Add tests for parsing CustomData records
+  // TODO: Add tests for parsing OtherData records
+});
+
 describe('Test endOfFileRecord()', () => {
   it('Create a standard EoF record', () => {
     expect(ihex.endOfFileRecord()).toEqual(':00000001FF');

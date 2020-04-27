@@ -1,5 +1,11 @@
-import { byteArrayToHexStr, byteToHexStr, concatUint8Arrays } from './utils';
+import {
+  hexStrToBytes,
+  byteArrayToHexStr,
+  byteToHexStrFast,
+  concatUint8Arrays,
+} from './utils';
 
+/** Values for the Record Type field, including fat-binaries custom types. */
 enum RecordType {
   Data = 0x00,
   EndOfFile = 0x01,
@@ -15,10 +21,23 @@ enum RecordType {
 }
 
 /**
+ * Defines the fields for an Intel Hex record.
+ *
+ * @interface Record
+ */
+interface Record {
+  byteCount: number;
+  address: number;
+  recordType: RecordType;
+  data: Uint8Array;
+  checksum: number;
+}
+
+/**
  * The maximum data bytes per record is 0xFF, 16 and 32 bytes are the two most
  * common lengths, but to start we'll only support 16 bytes
  */
-const RECORD_DATA_MAX_LENGTH = 16;
+const RECORD_DATA_MAX_BYTES = 16;
 
 /**
  * Constants for the record character lengths.
@@ -42,7 +61,7 @@ const MAX_RECORD_STR_LEN =
   BYTE_COUNT_STR_LEN +
   ADDRESS_STR_LEN +
   RECORD_TYPE_STR_LEN +
-  RECORD_DATA_MAX_LENGTH +
+  RECORD_DATA_MAX_BYTES * 2 +
   CHECKSUM_STR_LEN;
 
 /**
@@ -79,7 +98,7 @@ function createRecord(
     throw new Error('Custom record address out of range.');
   }
   const byteCount = dataBytes.length;
-  if (byteCount > RECORD_DATA_MAX_LENGTH) {
+  if (byteCount > RECORD_DATA_MAX_BYTES) {
     throw new Error('Custom record data has too many bytes.');
   }
 
@@ -90,8 +109,8 @@ function createRecord(
     dataBytes,
   ]);
   const recordContentStr = byteArrayToHexStr(recordContent);
-  const checksumStr = byteToHexStr(calcChecksumByte(recordContent));
-  return `${START_CODE_STR}${recordContentStr}${checksumStr}`.toUpperCase();
+  const checksumStr = byteToHexStrFast(calcChecksumByte(recordContent));
+  return `${START_CODE_STR}${recordContentStr}${checksumStr}`;
 }
 
 /**
@@ -104,13 +123,15 @@ function createRecord(
  * @param iHexRecord - Single Intel Hex record to check.
  * @returns A boolean indicating if the record is valid.
  */
-function isValidRecord(iHexRecord: string): boolean {
-  if (
-    iHexRecord.length < MIN_RECORD_STR_LEN ||
-    iHexRecord.length > MAX_RECORD_STR_LEN ||
-    iHexRecord[0] !== ':'
-  ) {
-    return false;
+function validateRecord(iHexRecord: string): boolean {
+  if (iHexRecord.length < MIN_RECORD_STR_LEN) {
+    throw new Error(`Record length too small: ${iHexRecord}`);
+  }
+  if (iHexRecord.length > MAX_RECORD_STR_LEN) {
+    throw new Error(`Record length is too large: ${iHexRecord}`);
+  }
+  if (iHexRecord[0] !== ':') {
+    throw new Error(`Record does not start with a ":": ${iHexRecord}`);
   }
   return true;
 }
@@ -126,9 +147,7 @@ function getRecordType(iHexRecord: string): RecordType {
   // replace it with something that just removes the \r and \n from the end of
   // the line
   iHexRecord = iHexRecord.trim();
-  if (!isValidRecord(iHexRecord)) {
-    throw new Error('Record is not valid.');
-  }
+  validateRecord(iHexRecord);
   const recordTypeCharStart =
     START_CODE_STR_LEN + BYTE_COUNT_STR_LEN + ADDRESS_STR_LEN;
   const recordTypeStr = iHexRecord.slice(
@@ -140,6 +159,55 @@ function getRecordType(iHexRecord: string): RecordType {
     throw new Error(`Record type '${recordTypeStr}' is not valid.`);
   }
   return recordType;
+}
+
+/**
+ * Parses an Intel Hex record into an Record object with its respective fields.
+ *
+ * @param iHexRecord Intel hex record line.
+ * @returns New object with the Record interface.
+ */
+function parseRecord(iHexRecord: string): Record {
+  validateRecord(iHexRecord);
+  let recordBytes;
+  try {
+    recordBytes = hexStrToBytes(iHexRecord.substring(1));
+  } catch (e) {
+    throw new Error(
+      `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
+    );
+  }
+  const byteCountIndex = 0;
+  const byteCount = recordBytes[0];
+
+  const addressIndex = byteCountIndex + BYTE_COUNT_STR_LEN / 2;
+  const address =
+    (recordBytes[addressIndex] << 8) + recordBytes[addressIndex + 1];
+
+  const recordTypeIndex = addressIndex + ADDRESS_STR_LEN / 2;
+  const recordType = recordBytes[recordTypeIndex];
+
+  const dataIndex = recordTypeIndex + RECORD_TYPE_STR_LEN / 2;
+  const data = recordBytes.subarray(dataIndex, -1);
+
+  const checksumIndex = dataIndex + byteCount;
+  const checksum = recordBytes[checksumIndex];
+
+  const totalLength = checksumIndex + CHECKSUM_STR_LEN / 2;
+  if (recordBytes.length > totalLength) {
+    throw new Error(
+      'Parsed record is larger than indicated by the byte count.' +
+        `\n\tExpected: ${totalLength}; Length: ${recordBytes.length}.`
+    );
+  }
+
+  return {
+    byteCount,
+    address,
+    recordType,
+    data,
+    checksum,
+  };
 }
 
 /**
@@ -175,6 +243,7 @@ export {
   RecordType,
   createRecord,
   getRecordType,
+  parseRecord,
   endOfFileRecord,
   extLinAddressRecord,
 };
