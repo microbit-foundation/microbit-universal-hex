@@ -1,7 +1,31 @@
 import * as utils from '../utils';
 
+describe('Test hexStrToBytes()', () => {
+  it('Converts hexadecimal string to a Uint8Array', () => {
+    expect(utils.hexStrToBytes('0102030A11FF80')).toEqual(
+      new Uint8Array([1, 2, 3, 10, 17, 255, 128])
+    );
+  });
+
+  it('Converts an empty string into an empty Uint8Array', () => {
+    expect(utils.hexStrToBytes('')).toEqual(new Uint8Array());
+  });
+
+  it('Converts an non-hex string into an empty Uint8Array', () => {
+    expect(() => {
+      utils.hexStrToBytes('carlos');
+    }).toThrow('non-hex characters');
+  });
+
+  it('Throws error when string does not contain even number of chars', () => {
+    expect(() => {
+      utils.hexStrToBytes('123');
+    }).toThrow('not divisible by 2');
+  });
+});
+
 describe('Test byteArrayToHexStr()', () => {
-  it('Convert a Uint8Array to a hexadecimal string', () => {
+  it('Converts a Uint8Array to a hexadecimal string', () => {
     const result = utils.byteArrayToHexStr(
       new Uint8Array([1, 2, 3, 10, 17, 255, 128])
     );
@@ -9,13 +33,31 @@ describe('Test byteArrayToHexStr()', () => {
     expect(result).toEqual('0102030A11FF80');
   });
 
-  it('Convert an empty Uint8Array into an empty string', () => {
+  it('Converts an empty Uint8Array into an empty string', () => {
     expect(utils.byteArrayToHexStr(new Uint8Array())).toEqual('');
   });
 });
 
+describe('Loop back between byteArrayToHexStr() and hexStrToBytes()', () => {
+  it('Converts a Uint8Array to a hexadecimal string and back again', () => {
+    const initialArray = new Uint8Array([66, 8, 90, 110, 217, 255, 128, 0]);
+
+    const result = utils.hexStrToBytes(utils.byteArrayToHexStr(initialArray));
+
+    expect(result).toEqual(initialArray);
+  });
+
+  it('Converts a hexadecimal string to a Uint8Array and back again', () => {
+    const initialStr = '28B1304601F018FF304608F034FB234F';
+
+    const result = utils.byteArrayToHexStr(utils.hexStrToBytes(initialStr));
+
+    expect(result).toEqual(initialStr);
+  });
+});
+
 describe('Test byteToHexStrFast()', () => {
-  it('A number that fits into a byte into a hexadecimal string', () => {
+  it('Converts a 1-byte number into a hexadecimal string', () => {
     expect(utils.byteToHexStrFast(10)).toEqual('0A');
     expect(utils.byteToHexStrFast(0)).toEqual('00');
     expect(utils.byteToHexStrFast(255)).toEqual('FF');
@@ -23,19 +65,19 @@ describe('Test byteToHexStrFast()', () => {
 });
 
 describe('Test byteToHexStr()', () => {
-  it('Positive integers that fits into a byte', () => {
+  it('Converts a 1-byte positive integer into a hexadecimal string', () => {
     expect(utils.byteToHexStr(10)).toEqual('0A');
     expect(utils.byteToHexStr(0, false)).toEqual('00');
     expect(utils.byteToHexStr(255)).toEqual('FF');
   });
 
-  it('Adds a prefix to the hex string', () => {
+  it('Adds a prefix to the converted hex string', () => {
     expect(utils.byteToHexStr(10, true)).toEqual('0x0A');
     expect(utils.byteToHexStr(0, true)).toEqual('0x00');
     expect(utils.byteToHexStr(255, true)).toEqual('0xFF');
   });
 
-  it('Positive integers that do not fit into a byte throw error', () => {
+  it('Throws error when integer does not fit into an unsigned byte', () => {
     expect(() => {
       utils.byteToHexStr(256);
     }).toThrow('does not fit');
@@ -45,7 +87,7 @@ describe('Test byteToHexStr()', () => {
     }).toThrow('does not fit');
   });
 
-  it('Floats throw error', () => {
+  it('Throws error when input is a float', () => {
     expect(() => {
       utils.byteToHexStr(100.5);
     }).toThrow('not an integer');
@@ -61,7 +103,7 @@ describe('Test byteToHexStr()', () => {
 });
 
 describe('Test concatUint8Arrays()', () => {
-  it('Concatenate Uint8Arrays of different sizes', () => {
+  it('Concatenates Uint8Arrays of different sizes', () => {
     const result = utils.concatUint8Arrays([
       new Uint8Array([1, 2]),
       new Uint8Array([3, 4, 5, 6, 7]),
@@ -72,7 +114,7 @@ describe('Test concatUint8Arrays()', () => {
     expect(result).toEqual(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
   });
 
-  it('Concatenate an empty array into an empty Uint8Arrays', () => {
+  it('Concatenates an empty array into an empty Uint8Arrays', () => {
     expect(utils.concatUint8Arrays([])).toEqual(new Uint8Array());
   });
 });

@@ -1,4 +1,32 @@
 /**
+ * Convert from a string with a hexadecimal number into a Uint8Array byte array.
+ *
+ * @export
+ * @param hexStr A string with a hexadecimal number.
+ * @returns A Uint8Array with the number broken down in bytes.
+ */
+export function hexStrToBytes(hexStr: string): Uint8Array {
+  if (hexStr.length % 2 !== 0) {
+    throw new Error(`Hex string "${hexStr}" is not divisible by 2.`);
+  }
+  const byteArray = hexStr.match(/.{1,2}/g);
+  if (byteArray) {
+    return new Uint8Array(
+      byteArray.map((byteStr) => {
+        const byteNum = parseInt(byteStr, 16);
+        if (Number.isNaN(byteNum)) {
+          throw new Error(`There were some non-hex characters in "${hexStr}".`);
+        } else {
+          return byteNum;
+        }
+      })
+    );
+  } else {
+    return new Uint8Array();
+  }
+}
+
+/**
  * Convert a positive integer byte (0 to 0xFF) into a hex string.
  *
  * @export
@@ -31,6 +59,7 @@ export function byteToHexStrFast(byte: number) {
   return byte.toString(16).toUpperCase().padStart(2, '0');
 }
 
+// TODO: Docstring
 export function byteArrayToHexStr(byteArray: Uint8Array): string {
   return byteArray.reduce(
     (accumulator, current) =>
@@ -39,6 +68,7 @@ export function byteArrayToHexStr(byteArray: Uint8Array): string {
   );
 }
 
+// TODO: Docstring
 export function concatUint8Arrays(arrayToConcat: Uint8Array[]): Uint8Array {
   const fullLength = arrayToConcat.reduce(
     (accumulator, currentValue) => accumulator + currentValue.length,
