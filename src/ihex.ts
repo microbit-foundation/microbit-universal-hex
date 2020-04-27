@@ -1,9 +1,4 @@
-import {
-  hexStrToBytes,
-  byteArrayToHexStr,
-  byteToHexStrFast,
-  concatUint8Arrays,
-} from './utils';
+import * as utils from './utils';
 
 /** Values for the Record Type field, including fat-binaries custom types. */
 enum RecordType {
@@ -102,14 +97,14 @@ function createRecord(
     throw new Error('Custom record data has too many bytes.');
   }
 
-  const recordContent = concatUint8Arrays([
+  const recordContent = utils.concatUint8Arrays([
     new Uint8Array([byteCount]),
     new Uint8Array([address >> 8, address & 0xff]),
     new Uint8Array([recordType]),
     dataBytes,
   ]);
-  const recordContentStr = byteArrayToHexStr(recordContent);
-  const checksumStr = byteToHexStrFast(calcChecksumByte(recordContent));
+  const recordContentStr = utils.byteArrayToHexStr(recordContent);
+  const checksumStr = utils.byteToHexStrFast(calcChecksumByte(recordContent));
   return `${START_CODE_STR}${recordContentStr}${checksumStr}`;
 }
 
@@ -171,7 +166,7 @@ function parseRecord(iHexRecord: string): Record {
   validateRecord(iHexRecord);
   let recordBytes;
   try {
-    recordBytes = hexStrToBytes(iHexRecord.substring(1));
+    recordBytes = utils.hexStrToBytes(iHexRecord.substring(1));
   } catch (e) {
     throw new Error(
       `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
@@ -239,6 +234,17 @@ function extLinAddressRecord(address: number): string {
   );
 }
 
+function blockStartRecord(boardId: number): string {
+  if (boardId < 0 || boardId > 0xffff) {
+    throw new Error('Board ID out of range when creating Block Start record.');
+  }
+  return createRecord(
+    0,
+    RecordType.BlockStart,
+    new Uint8Array([(boardId >> 8) & 0xff, boardId & 0xff, 0xc0, 0xde])
+  );
+}
+
 export {
   RecordType,
   createRecord,
@@ -246,4 +252,5 @@ export {
   parseRecord,
   endOfFileRecord,
   extLinAddressRecord,
+  blockStartRecord,
 };

@@ -220,3 +220,22 @@ describe('Test extLinAddressRecord()', () => {
 
   // TODO: Add tests for all thrown exceptions
 });
+
+describe('Test blockStartRecord()', () => {
+  it('Create a custom Block Start Record', () => {
+    expect(ihex.blockStartRecord(0x9901)).toEqual(':0400000A9901C0DEBA');
+    expect(ihex.blockStartRecord(0x9903)).toEqual(':0400000A9903C0DEB8');
+  });
+
+  it('Throws error when the Board ID larger than 4 bytes', () => {
+    expect(() => {
+      ihex.blockStartRecord(0x10000);
+    }).toThrow('Board ID out of range');
+  });
+
+  it('Throws error when the Board ID a negative value', () => {
+    expect(() => {
+      ihex.blockStartRecord(-1);
+    }).toThrow('Board ID out of range');
+  });
+});
