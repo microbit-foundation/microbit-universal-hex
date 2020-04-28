@@ -8,8 +8,8 @@
     "fat binary",
     "fb"
   ],
-  "main": "./dist/bundles/index.umd.js",
-  "mainMin": "./dist/bundles/index.umd.min.js",
+  "main": "./dist/bundles/microbit-fb.umd.js",
+  "mainMin": "./dist/bundles/microbit-fb.umd.min.js",
   "module": "./dist/esm5/index.js",
   "typings": "./dist/types/index.d.ts",
   "sideEffects": false,
