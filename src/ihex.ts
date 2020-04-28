@@ -60,6 +60,25 @@ const MAX_RECORD_STR_LEN =
   CHECKSUM_STR_LEN;
 
 /**
+ * Checks if a given number is a valid Record type.
+ *
+ * @param recordType Number to check
+ * @returns True if it's a valid Record type.
+ */
+function isRecordTypeValid(recordType: RecordType): boolean {
+  // Checking ranges is more efficient than object key comparison
+  // This also allow us use a const enum (compilation replaces it by literals)
+  if (
+    (recordType >= RecordType.Data &&
+      recordType <= RecordType.StartLinearAddress) ||
+    (recordType >= RecordType.BlockStart && recordType <= RecordType.OtherData)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Calculates the Intel Hex checksum.
  *
  * This is basically the LSB of the two's complement of the sum of all bytes.
@@ -97,6 +116,9 @@ function createRecord(
     throw new Error(
       `Record (${recordType}) data has too many bytes (${byteCount}).`
     );
+  }
+  if (!isRecordTypeValid(recordType)) {
+    throw new Error(`Record type '${recordType}' is not valid.`);
   }
 
   const recordContent = utils.concatUint8Arrays([
@@ -140,10 +162,6 @@ function validateRecord(iHexRecord: string): boolean {
  * @returns The RecordType value.
  */
 function getRecordType(iHexRecord: string): RecordType {
-  // TODO: This will trim white spaces and new lines anywhere, we need to
-  // replace it with something that just removes the \r and \n from the end of
-  // the line
-  iHexRecord = iHexRecord.trim();
   validateRecord(iHexRecord);
   const recordTypeCharStart =
     START_CODE_STR_LEN + BYTE_COUNT_STR_LEN + ADDRESS_STR_LEN;
@@ -152,7 +170,7 @@ function getRecordType(iHexRecord: string): RecordType {
     recordTypeCharStart + RECORD_TYPE_STR_LEN
   );
   const recordType = parseInt(recordTypeStr, 16);
-  if (!(recordType in RecordType)) {
+  if (!isRecordTypeValid(recordType)) {
     throw new Error(`Record type '${recordTypeStr}' is not valid.`);
   }
   return recordType;
