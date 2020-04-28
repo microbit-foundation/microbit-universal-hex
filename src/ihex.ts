@@ -90,11 +90,13 @@ function createRecord(
   dataBytes: Uint8Array
 ): string {
   if (address < 0 || address > 0xffff) {
-    throw new Error('Custom record address out of range.');
+    throw new Error(`Record (${recordType}) address out of range: ${address}`);
   }
   const byteCount = dataBytes.length;
   if (byteCount > RECORD_DATA_MAX_BYTES) {
-    throw new Error('Custom record data has too many bytes.');
+    throw new Error(
+      `Record (${recordType}) data has too many bytes (${byteCount}).`
+    );
   }
 
   const recordContent = utils.concatUint8Arrays([
@@ -252,6 +254,20 @@ function blockStartRecord(boardId: number): string {
 }
 
 /**
+ * Create Block End (custom) Intel Hex Record.
+ *
+ * The Data field in this Record will be ignored and can be used for padding.
+ *
+ * @param padBytesLen Number of bytes to add to the Data field.
+ * @returns A Block En (custom) Intel Hex record.
+ */
+function blockEndRecord(padBytesLen: number): string {
+  // Input sanitation will be done in createRecord, no need to do it here too
+  const recordData = new Uint8Array(padBytesLen).fill(0xff);
+  return createRecord(0, RecordType.BlockEnd, recordData);
+}
+
+/**
  * Changes the record type of a Record to a Custom Data type.
  *
  * The data field is kept, but changing the record type will trigger the
@@ -284,6 +300,7 @@ export {
   endOfFileRecord,
   extLinAddressRecord,
   blockStartRecord,
+  blockEndRecord,
   convertRecordToCustomData,
   iHexToRecords,
 };

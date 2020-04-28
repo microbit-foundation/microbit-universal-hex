@@ -55,7 +55,25 @@ describe('Test createRecord() for standard records', () => {
   // TODO: Add tests for the StartSegmentAddress record
   // TODO: Add tests for the ExtendedLinearAddress record
   // TODO: Add tests for the StartLinearAddress record
-  // TODO: Add tests for all the thrown exceptions
+
+  it('Throws error when data given is too large', () => {
+    expect(() => {
+      const d = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+      ihex.createRecord(0, ihex.RecordType.Data, new Uint8Array(d));
+    }).toThrow();
+  });
+
+  it('Throws error when the address is too large', () => {
+    expect(() => {
+      ihex.createRecord(0x10000, ihex.RecordType.Data, new Uint8Array([]));
+    }).toThrow('address out of range');
+  });
+
+  it('Throws error when the address is negative', () => {
+    expect(() => {
+      ihex.createRecord(-1, ihex.RecordType.Data, new Uint8Array([]));
+    }).toThrow('address out of range');
+  });
 });
 
 describe('Test createRecord() for custom records', () => {
@@ -222,7 +240,7 @@ describe('Test extLinAddressRecord()', () => {
 });
 
 describe('Test blockStartRecord()', () => {
-  it('Create a custom Block Start Record', () => {
+  it('Creates a custom Block Start Record', () => {
     expect(ihex.blockStartRecord(0x9901)).toEqual(':0400000A9901C0DEBA');
     expect(ihex.blockStartRecord(0x9903)).toEqual(':0400000A9903C0DEB8');
   });
@@ -237,6 +255,29 @@ describe('Test blockStartRecord()', () => {
     expect(() => {
       ihex.blockStartRecord(-1);
     }).toThrow('Board ID out of range');
+  });
+});
+
+describe('Test blockEndRecord()', () => {
+  it('Creates a custom Block End Record', () => {
+    expect(ihex.blockEndRecord(0)).toEqual(':0000000BF5');
+    expect(ihex.blockEndRecord(1)).toEqual(':0100000BFFF5');
+    expect(ihex.blockEndRecord(0x9)).toEqual(':0900000BFFFFFFFFFFFFFFFFFFF5');
+    expect(ihex.blockEndRecord(0x10)).toEqual(
+      ':1000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5'
+    );
+  });
+
+  it('Throws error when the number of bytes to pad is a negative value', () => {
+    expect(() => {
+      ihex.blockEndRecord(-1);
+    }).toThrow();
+  });
+
+  it('Throws error when the number of bytes to pad is too large', () => {
+    expect(() => {
+      ihex.blockEndRecord(17);
+    }).toThrow('has too many bytes');
   });
 });
 
