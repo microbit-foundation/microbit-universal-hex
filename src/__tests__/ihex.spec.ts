@@ -255,3 +255,7 @@ describe('Test convertRecordToCustomData()', () => {
     ).toEqual(':10B0400DD90B08BD40420F0070B5044616460D469B');
   });
 });
+
+describe('Test iHexToRecords()', () => {
+  // TODO: Add test for this function.
+});

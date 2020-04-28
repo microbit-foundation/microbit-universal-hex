@@ -265,6 +265,17 @@ function convertRecordToCustomData(iHexRecord: string): string {
   return createRecord(record.address, RecordType.CustomData, record.data);
 }
 
+/**
+ * Separates an Intel Hex file (string) into an array of Records.
+ *
+ * @param iHexStr Intel Hex file as a string
+ * @returns Array of Records in string format
+ */
+function iHexToRecords(iHexStr: string): string[] {
+  // TODO: Deal with \r line delimiters
+  return iHexStr.split('\n');
+}
+
 export {
   RecordType,
   createRecord,
@@ -274,4 +285,5 @@ export {
   extLinAddressRecord,
   blockStartRecord,
   convertRecordToCustomData,
+  iHexToRecords,
 };
