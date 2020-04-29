@@ -286,6 +286,16 @@ function blockEndRecord(padBytesLen: number): string {
 }
 
 /**
+ * The Block end record can add bytes to the data field to be generate 512 byte
+ * blocks. This function exposes how many bytes the record can fit.
+ *
+ * @returns Number of padding bytes that fit inside a Block End (custom) Record.
+ */
+function blockEndPaddingCapacity(): number {
+  return RECORD_DATA_MAX_BYTES;
+}
+
+/**
  * Changes the record type of a Record to a Custom Data type.
  *
  * The data field is kept, but changing the record type will trigger the
@@ -321,6 +331,7 @@ export {
   extLinAddressRecord,
   blockStartRecord,
   blockEndRecord,
+  blockEndPaddingCapacity,
   convertRecordToCustomData,
   iHexToRecordStrs,
 };

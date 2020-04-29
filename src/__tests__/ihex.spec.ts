@@ -281,6 +281,12 @@ describe('Test blockEndRecord()', () => {
   });
 });
 
+describe('Test blockEndPaddingCapacity()', () => {
+  it('Check return value is 0x10', () => {
+    expect(ihex.blockEndPaddingCapacity()).toEqual(16);
+  });
+});
+
 describe('Test convertRecordToCustomData()', () => {
   it('Converts a Data Record into a Custom Data Record', () => {
     expect(
