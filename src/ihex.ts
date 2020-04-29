@@ -300,14 +300,16 @@ function convertRecordToCustomData(iHexRecord: string): string {
 }
 
 /**
- * Separates an Intel Hex file (string) into an array of Records.
+ * Separates an Intel Hex file (string) into an array of Record strings.
  *
- * @param iHexStr Intel Hex file as a string
- * @returns Array of Records in string format
+ * @param iHexStr Intel Hex file as a string.
+ * @returns Array of Records in string format.
  */
-function iHexToRecords(iHexStr: string): string[] {
-  // TODO: Deal with \r line delimiters
-  return iHexStr.split('\n');
+function iHexToRecordStrs(iHexStr: string): string[] {
+  const output = iHexStr.split(/\r?\n/);
+  // Boolean filter removes all falsy values as some of these files contain
+  // multiple empty lines we want to remove
+  return output.filter(Boolean);
 }
 
 export {
@@ -320,5 +322,5 @@ export {
   blockStartRecord,
   blockEndRecord,
   convertRecordToCustomData,
-  iHexToRecords,
+  iHexToRecordStrs,
 };
