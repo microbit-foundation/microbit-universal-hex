@@ -8,7 +8,7 @@
   "typescript.implementationsCodeLens.enabled": true,
   "typescript.referencesCodeLens.enabled": true,
   "javascript.referencesCodeLens.enabled": true,
-  "editor.rulers": [
-    80,100
-  ]
+  "editor.rulers": [80, 100],
+  // This is only applicable to the cSpell extenson
+  "cSpell.words": ["ihex", "strs"]
 }
