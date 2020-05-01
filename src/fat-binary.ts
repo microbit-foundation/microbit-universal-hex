@@ -1,6 +1,24 @@
+/**
+ * Converts standard Intel Hex strings into fat binaries with records organised
+ * in self contained 512-byte blocks.
+ *
+ * (c) 2020 Micro:bit Educational Foundation and the microbit-fb contributors.
+ * SPDX-License-Identifier: MIT
+ */
 import * as ihex from './ihex';
 
+const V1_BOARD_IDS = [0x9900, 0x9901];
+const BLOCK_SIZE = 512;
+
 /**
+ * Converts a hex file string into a fat-binary ready hex string using custom
+ * records and 512 byte blocks.
+ *
+ * Block format:
+ *  - Extended linear address record
+ *
+ * More information on the format:
+ *  https://github.com/microbit-foundation/fat-binaries
  *
  * @throws {Error} When the Board ID is not between 0 and 2^16.
  *
@@ -9,49 +27,87 @@ import * as ihex from './ihex';
  * @returns New Intel Hex string with the custom format.
  */
 function iHexToCustomFormat(iHexStr: string, boardId: number): string {
-  const startRecord = ihex.blockStartRecord(boardId);
+  // Hex files for v1.3 and v1.5 continue using the normal Data Record Type
+  const replaceDataRecord = !V1_BOARD_IDS.includes(boardId);
 
-  const blockLines = [];
+  // Generate some constant records
+  const startRecord = ihex.blockStartRecord(boardId);
   const hexRecords = ihex.iHexToRecordStrs(iHexStr);
   let currentExtAddr = ihex.extLinAddressRecord(0);
+
+  // Pre-calculate known record lengths
+  const extAddrRecordLen = currentExtAddr.length;
+  const startRecordLen = startRecord.length;
+  const endRecordBaseLen = ihex.blockEndRecord(0).length;
+  const recordPaddingCapacity = ihex.recordPaddingCapacity();
+  const padRecordBaseLen = ihex.paddedDataRecord(0).length;
+
+  // Each loop iteration corresponds to a 512-bytes block
   let ih = 0;
-  const hexLength = hexRecords.length;
-  while (ih < hexLength) {
-    // First we need to check if the first line is an extended linear record
+  const blockLines = [];
+  while (ih < hexRecords.length) {
+    let blockLen = 0;
+    // Check for an extended linear record to not repeat it after a block start
     const firstRecordType = ihex.getRecordType(hexRecords[ih]);
     if (firstRecordType === ihex.RecordType.ExtendedLinearAddress) {
       currentExtAddr = hexRecords[ih];
       ih++;
     }
     blockLines.push(currentExtAddr);
+    blockLen += extAddrRecordLen + 1;
     blockLines.push(startRecord);
+    blockLen += startRecordLen + 1;
+    blockLen += endRecordBaseLen + 1;
 
-    const loopEnd = Math.min(10, hexLength - ih);
     let endOfFile = false;
-    for (let j = 0; j < loopEnd; j++) {
+    while (
+      hexRecords[ih] &&
+      BLOCK_SIZE >= blockLen + hexRecords[ih].length + 1
+    ) {
       let record = hexRecords[ih++];
       const recordType = ihex.getRecordType(record);
-      if (recordType === ihex.RecordType.Data) {
+      if (replaceDataRecord && recordType === ihex.RecordType.Data) {
         record = ihex.convertRecordToCustomData(record);
+      } else if (recordType === ihex.RecordType.ExtendedLinearAddress) {
+        currentExtAddr = record;
       } else if (recordType === ihex.RecordType.EndOfFile) {
         endOfFile = true;
-        // Error if we encounter an EoF record and it's not the end of the file
-        if (ih !== hexLength) {
-          throw new Error(`EoF record found at line ${ih} of ${hexLength}`);
-        }
         break;
-      } else if (ihex.RecordType.ExtendedLinearAddress) {
-        currentExtAddr = record;
       }
       blockLines.push(record);
+      blockLen += record.length + 1;
     }
-    blockLines.push(ihex.blockEndRecord(0));
+
     if (endOfFile) {
+      // Error if we encounter an EoF record and it's not the end of the file
+      if (ih !== hexRecords.length) {
+        throw new Error(
+          `EoF record found at line ${ih} of ${hexRecords.length}`
+        );
+      }
+      // The EoF record goes after the Block End Record, it won't break 512-byte
+      // boundary as it was already calculated in the previous loop that it fits
+      blockLines.push(ihex.blockEndRecord(0));
       blockLines.push(ihex.endOfFileRecord());
+    } else {
+      // We might need an additional padding records
+      // const charsLeft = BLOCK_SIZE - blockLen;
+      while (BLOCK_SIZE - blockLen > recordPaddingCapacity * 2) {
+        const record = ihex.paddedDataRecord(
+          Math.min(
+            (BLOCK_SIZE - blockLen - (padRecordBaseLen + 1)) / 2,
+            recordPaddingCapacity
+          )
+        );
+        blockLines.push(record);
+        blockLen += record.length + 1;
+      }
+      // TODO: Can we have a block that needs an odd number of padded chars?
+      blockLines.push(ihex.blockEndRecord((BLOCK_SIZE - blockLen) / 2));
     }
   }
 
-  return blockLines.join('\n');
+  return blockLines.join('\n') + '\n';
 }
 
 export { iHexToCustomFormat };
