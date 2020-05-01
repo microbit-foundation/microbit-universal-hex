@@ -110,4 +110,27 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
   return blockLines.join('\n') + '\n';
 }
 
-export { iHexToCustomFormat };
+function createFatBinary(hexes: { hex: string; boardID: number }[]): string {
+  const endOfFileRecord = ihex.endOfFileRecord() + '\n';
+  const customHexes: string[] = [];
+  // We remove the EoF record from all but the last hex file
+  for (let i = 0; i < hexes.length - 1; i++) {
+    let customHex = iHexToCustomFormat(hexes[i].hex, hexes[i].boardID);
+    if (customHex.endsWith(endOfFileRecord)) {
+      customHex = customHex.slice(0, customHex.length - endOfFileRecord.length);
+    }
+    customHexes.push(customHex);
+  }
+  // Process the last hex file with a guarantee EoF record
+  const lastCustomHex = iHexToCustomFormat(
+    hexes[hexes.length - 1].hex,
+    hexes[hexes.length - 1].boardID
+  );
+  customHexes.push(lastCustomHex);
+  if (!lastCustomHex.endsWith(endOfFileRecord)) {
+    customHexes.push(endOfFileRecord);
+  }
+  return customHexes.join('\n');
+}
+
+export { iHexToCustomFormat, createFatBinary };
