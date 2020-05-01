@@ -281,9 +281,32 @@ describe('Test blockEndRecord()', () => {
   });
 });
 
-describe('Test blockEndPaddingCapacity()', () => {
+describe('Test recordPaddingCapacity()', () => {
   it('Check return value is 0x10', () => {
-    expect(ihex.blockEndPaddingCapacity()).toEqual(16);
+    expect(ihex.recordPaddingCapacity()).toEqual(16);
+  });
+});
+
+describe('Test paddedDataRecord()', () => {
+  it('Creates a custom Padded Data Record', () => {
+    expect(ihex.paddedDataRecord(0)).toEqual(':0000000CF4');
+    expect(ihex.paddedDataRecord(1)).toEqual(':0100000CFFF4');
+    expect(ihex.paddedDataRecord(0x9)).toEqual(':0900000CFFFFFFFFFFFFFFFFFFF4');
+    expect(ihex.paddedDataRecord(0x10)).toEqual(
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4'
+    );
+  });
+
+  it('Throws error when the number of bytes to pad is a negative value', () => {
+    expect(() => {
+      ihex.paddedDataRecord(-1);
+    }).toThrow();
+  });
+
+  it('Throws error when the number of bytes to pad is too large', () => {
+    expect(() => {
+      ihex.paddedDataRecord(17);
+    }).toThrow('has too many bytes');
   });
 });
 

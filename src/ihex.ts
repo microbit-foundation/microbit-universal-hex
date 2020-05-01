@@ -277,7 +277,7 @@ function blockStartRecord(boardId: number): string {
  * The Data field in this Record will be ignored and can be used for padding.
  *
  * @param padBytesLen Number of bytes to add to the Data field.
- * @returns A Block En (custom) Intel Hex record.
+ * @returns A Block End (custom) Intel Hex record.
  */
 function blockEndRecord(padBytesLen: number): string {
   // Input sanitation will be done in createRecord, no need to do it here too
@@ -291,8 +291,22 @@ function blockEndRecord(padBytesLen: number): string {
  *
  * @returns Number of padding bytes that fit inside a Block End (custom) Record.
  */
-function blockEndPaddingCapacity(): number {
+function recordPaddingCapacity(): number {
   return RECORD_DATA_MAX_BYTES;
+}
+
+/**
+ * Create a Padded Data (custom) Intel Hex Record.
+ * This record is used to add padding data, to be ignored by DAPLink, to be able
+ * to create blocks of 512-bytes.
+ *
+ * @param padBytesLen Number of bytes to add to the Data field.
+ * @returns A Padded Data (custom) Intel Hex record.
+ */
+function paddedDataRecord(padBytesLen: number): string {
+  // Input sanitation will be done in createRecord, no need to do it here too
+  const recordData = new Uint8Array(padBytesLen).fill(0xff);
+  return createRecord(0, RecordType.PaddedData, recordData);
 }
 
 /**
@@ -331,7 +345,8 @@ export {
   extLinAddressRecord,
   blockStartRecord,
   blockEndRecord,
-  blockEndPaddingCapacity,
+  paddedDataRecord,
+  recordPaddingCapacity,
   convertRecordToCustomData,
   iHexToRecordStrs,
 };
