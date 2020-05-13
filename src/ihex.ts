@@ -330,7 +330,10 @@ function convertRecordToCustomData(iHexRecord: string): string {
  * @returns Array of Records in string format.
  */
 function iHexToRecordStrs(iHexStr: string): string[] {
-  const output = iHexStr.split(/\r?\n/);
+  // For some reason this is quicker than .split(/\r?\n/)
+  // Up to x200 faster in Chrome (!) and x1.5 faster in Firefox
+  const output = iHexStr.replace(/\r/g, '').split('\n');
+
   // Boolean filter removes all falsy values as some of these files contain
   // multiple empty lines we want to remove
   return output.filter(Boolean);
