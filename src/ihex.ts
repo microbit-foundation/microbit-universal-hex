@@ -280,9 +280,21 @@ function blockStartRecord(boardId: number): string {
  * @returns A Block End (custom) Intel Hex record.
  */
 function blockEndRecord(padBytesLen: number): string {
-  // Input sanitation will be done in createRecord, no need to do it here too
-  const recordData = new Uint8Array(padBytesLen).fill(0xff);
-  return createRecord(0, RecordType.BlockEnd, recordData);
+  // This function is called very often with the same arguments, so cache
+  // those results for better performance
+  switch (padBytesLen) {
+    case 0x4:
+      // Common for blocks that have full Data records with 0x10 bytes and a
+      // single Extended Linear Address record
+      return ':0400000BFFFFFFFFF5';
+    case 0x0c:
+      // The most common padding, when a block has 10 full (0x10) Data records
+      return ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5';
+    default:
+      // Input sanitation will be done in createRecord, no need to do it here too
+      const recordData = new Uint8Array(padBytesLen).fill(0xff);
+      return createRecord(0, RecordType.BlockEnd, recordData);
+  }
 }
 
 /**
