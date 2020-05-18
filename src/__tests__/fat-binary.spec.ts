@@ -1,0 +1,219 @@
+import * as fs from 'fs';
+
+import * as fb from '../fat-binary';
+
+describe('Test iHexToCustomFormat()', () => {
+  it('Pads blocks with additional records to reach 512 bytes', () => {
+    const hexStr =
+      ':020000040000FA\n' +
+      ':10F39000002070470E207047002803D00A490861FA\n' +
+      ':10F3E00010C9121FA342F8D018BA21BA884201D915\n' +
+      ':020000040003F7\n' +
+      ':103F40006A4623C210A82A46FF21808A0C9B02F0F1\n';
+    const expected =
+      ':020000040000FA\n' +
+      ':0400000A9903C0DEB8\n' +
+      ':10F3900D002070470E207047002803D00A490861ED\n' +
+      ':10F3E00D10C9121FA342F8D018BA21BA884201D908\n' +
+      ':020000040003F7\n' +
+      ':103F400D6A4623C210A82A46FF21808A0C9B02F0E4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':0400000BFFFFFFFFF5\n';
+
+    const result = fb.iHexToCustomFormat(hexStr, 0x9903);
+
+    expect(result).toEqual(expected);
+    expect(result.length).toEqual(512);
+  });
+
+  it("There isn't an off-by-one error for a block that fits exactly", () => {
+    const hexStr =
+      ':020000040003F7\n' +
+      ':108D800003F09F928E203D20496D6167652E444916\n' +
+      ':108D9000414D4F4E440AF09F8FA0203D20496D6108\n' +
+      ':108DA00067652E484F5553450AFFFFFFFFFFFFFF42\n' +
+      ':108DB000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3\n' +
+      ':108DC000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB3\n' +
+      ':108DD000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA3\n' +
+      ':108DE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF93\n' +
+      ':108DF000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF83\n' +
+      ':01F80000FDFF0A\n' +
+      ':020000041000EA\n' +
+      ':1010C0007CB0EE17FFFFFFFF0A0000000000E30006\n' +
+      ':0C10D000FFFFFFFF2D6D0300000000007B\n';
+    const expected =
+      ':020000040003F7\n' +
+      ':0400000A9901C0DEBA\n' +
+      ':108D800003F09F928E203D20496D6167652E444916\n' +
+      ':108D9000414D4F4E440AF09F8FA0203D20496D6108\n' +
+      ':108DA00067652E484F5553450AFFFFFFFFFFFFFF42\n' +
+      ':108DB000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3\n' +
+      ':108DC000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB3\n' +
+      ':108DD000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA3\n' +
+      ':108DE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF93\n' +
+      ':108DF000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF83\n' +
+      ':01F80000FDFF0A\n' +
+      ':020000041000EA\n' +
+      ':1010C0007CB0EE17FFFFFFFF0A0000000000E30006\n' +
+      ':0C10D000FFFFFFFF2D6D0300000000007B\n' +
+      ':0000000BF5\n';
+
+    const result = fb.iHexToCustomFormat(hexStr, 0x9901);
+
+    expect(result).toEqual(expected);
+    expect(result.length).toEqual(512);
+  });
+
+  it('One byte too large and the last record is moved to a new padded block', () => {
+    const hexStr =
+      ':020000040003F7\n' +
+      ':108D800003F09F928E203D20496D6167652E444916\n' +
+      ':108D9000414D4F4E440AF09F8FA0203D20496D6108\n' +
+      ':108DA00067652E484F5553450AFFFFFFFFFFFFFF42\n' +
+      ':108DB000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3\n' +
+      ':108DC000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB3\n' +
+      ':108DD000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA3\n' +
+      ':108DE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF93\n' +
+      ':108DF000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF83\n' +
+      ':03F80000FDFFFF0A\n' +
+      ':020000041000EA\n' +
+      ':1010C0007CB0EE17FFFFFFFF0A0000000000E30006\n' +
+      ':0C10D000FFFFFFFF2D6D0300000000007B\n';
+    const expected =
+      ':020000040003F7\n' +
+      ':0400000A9901C0DEBA\n' +
+      ':108D800003F09F928E203D20496D6167652E444916\n' +
+      ':108D9000414D4F4E440AF09F8FA0203D20496D6108\n' +
+      ':108DA00067652E484F5553450AFFFFFFFFFFFFFF42\n' +
+      ':108DB000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3\n' +
+      ':108DC000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFB3\n' +
+      ':108DD000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA3\n' +
+      ':108DE000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF93\n' +
+      ':108DF000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF83\n' +
+      ':03F80000FDFFFF0A\n' +
+      ':020000041000EA\n' +
+      ':1010C0007CB0EE17FFFFFFFF0A0000000000E30006\n' +
+      ':0B00000CFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':0000000BF5\n' +
+      ':020000041000EA\n' +
+      ':0400000A9901C0DEBA\n' +
+      ':0C10D000FFFFFFFF2D6D0300000000007B\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
+      ':1000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5\n';
+
+    const result = fb.iHexToCustomFormat(hexStr, 0x9901);
+
+    expect(result).toEqual(expected);
+    expect(result.length).toEqual(1024);
+  });
+
+  it('9901 and 9903 IDs left data records untouched', () => {
+    const hexStr =
+      ':020000040000FA\n' +
+      ':10F39000002070470E207047002803D00A490861FA\n' +
+      ':10F3E00010C9121FA342F8D018BA21BA884201D915\n' +
+      ':020000040003F7\n' +
+      ':103F40006A4623C210A82A46FF21808A0C9B02F0F1\n';
+    const expected9900 = [
+      ':020000040000FA\n',
+      ':0400000A9900C0DEBB\n',
+      ':10F39000002070470E207047002803D00A490861FA\n',
+      ':10F3E00010C9121FA342F8D018BA21BA884201D915\n',
+      ':020000040003F7\n',
+      ':103F40006A4623C210A82A46FF21808A0C9B02F0F1\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n',
+      ':0400000BFFFFFFFFF5\n',
+    ];
+    const expected9901 = [...expected9900];
+    expected9901[1] = ':0400000A9901C0DEBA\n';
+
+    const result9900 = fb.iHexToCustomFormat(hexStr, 0x9900);
+    const result9901 = fb.iHexToCustomFormat(hexStr, 0x9901);
+
+    expect(result9900).toEqual(expected9900.join(''));
+    expect(result9900.length).toEqual(512);
+    expect(result9901).toEqual(expected9901.join(''));
+    expect(result9901.length).toEqual(512);
+  });
+
+  it('EoF record placed after the block if it fits', () => {
+    const hexStr =
+      ':020000040000FA\n' +
+      ':109C40001ED0A180287A012805D00320A0715F488A\n' +
+      ':109C5000EF22817F6FE70220F8E721462846029A2B\n' +
+      ':020000040003F7\n' +
+      ':1072400019D0134B9C421BD00123A54206D0180035\n' +
+      ':00000001FF\n';
+    const expected =
+      ':020000040000FA\n' +
+      ':0400000A9903C0DEB8\n' +
+      ':109C400D1ED0A180287A012805D00320A0715F487D\n' +
+      ':109C500DEF22817F6FE70220F8E721462846029A1E\n' +
+      ':020000040003F7\n' +
+      ':1072400D19D0134B9C421BD00123A54206D0180028\n' +
+      ':0000000BF5\n' +
+      ':00000001FF\n';
+
+    const result = fb.iHexToCustomFormat(hexStr, 0x9903);
+
+    expect(result).toEqual(expected);
+  });
+
+  it('Empty Hex string produces an empty-ish output', () => {
+    const result = fb.iHexToCustomFormat('', 0x9903);
+
+    expect(result).toEqual('\n');
+  });
+});
+
+/*
+describe('Not real unit tests, just converting files for manual testing', () => {
+  const hex1 = fs.readFileSync(
+    './src/__tests__/hex-files/1-duck-umbrella.hex',
+    'utf8'
+  );
+  const hex2 = fs.readFileSync(
+    './src/__tests__/hex-files/2-ghost-music.hex',
+    'utf8'
+  );
+
+  it('.', () => {
+    const result1 = fb.iHexToCustomFormat(hex1, 0x9901);
+    fs.writeFileSync('./src/__tests__/hex-files/test-output-1.hex', result1);
+    const result2 = fb.iHexToCustomFormat(hex2, 0x9903);
+    fs.writeFileSync('./src/__tests__/hex-files/test-output-2.hex', result2);
+
+    expect('').toEqual('');
+  });
+
+  it('..', () => {
+    const result = fb.createFatBinary([
+      { hex: hex1, boardID: 0x9901 },
+      { hex: hex2, boardID: 0x9903 },
+    ]);
+    fs.writeFileSync('./src/__tests__/hex-files/test-output-fat.hex', result);
+
+    expect('').toEqual('');
+  });
+});
+*/
