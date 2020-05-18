@@ -122,9 +122,7 @@ function createRecord(
   }
 
   const recordContent = utils.concatUint8Arrays([
-    new Uint8Array([byteCount]),
-    new Uint8Array([address >> 8, address & 0xff]),
-    new Uint8Array([recordType]),
+    new Uint8Array([byteCount, address >> 8, address & 0xff, recordType]),
     dataBytes,
   ]);
   const recordContentStr = utils.byteArrayToHexStr(recordContent);
@@ -203,9 +201,8 @@ function parseRecord(iHexRecord: string): Record {
   const recordType = recordBytes[recordTypeIndex];
 
   const dataIndex = recordTypeIndex + RECORD_TYPE_STR_LEN / 2;
-  const data = recordBytes.subarray(dataIndex, -1);
-
   const checksumIndex = dataIndex + byteCount;
+  const data = recordBytes.slice(dataIndex, checksumIndex);
   const checksum = recordBytes[checksumIndex];
 
   const totalLength = checksumIndex + CHECKSUM_STR_LEN / 2;
@@ -331,8 +328,16 @@ function paddedDataRecord(padBytesLen: number): string {
  * @returns A Custom Data Intel Hex record with the same data field.
  */
 function convertRecordToCustomData(iHexRecord: string): string {
-  const record = parseRecord(iHexRecord);
-  return createRecord(record.address, RecordType.CustomData, record.data);
+  const oRecord = parseRecord(iHexRecord);
+  const recordContent: Uint8Array = new Uint8Array(oRecord.data.length + 4);
+  recordContent[0] = oRecord.data.length;
+  recordContent[1] = oRecord.address >> 8;
+  recordContent[2] = oRecord.address & 0xff;
+  recordContent[3] = RecordType.CustomData;
+  recordContent.set(oRecord.data, 4);
+  const recordContentStr = utils.byteArrayToHexStr(recordContent);
+  const checksumStr = utils.byteToHexStrFast(calcChecksumByte(recordContent));
+  return `${START_CODE_STR}${recordContentStr}${checksumStr}`;
 }
 
 /**
