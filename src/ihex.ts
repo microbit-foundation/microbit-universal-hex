@@ -211,7 +211,7 @@ function parseRecord(iHexRecord: string): Record {
   const totalLength = checksumIndex + CHECKSUM_STR_LEN / 2;
   if (recordBytes.length > totalLength) {
     throw new Error(
-      'Parsed record is larger than indicated by the byte count.' +
+      `Parsed record "${iHexRecord}" is larger than indicated by the byte count.` +
         `\n\tExpected: ${totalLength}; Length: ${recordBytes.length}.`
     );
   }

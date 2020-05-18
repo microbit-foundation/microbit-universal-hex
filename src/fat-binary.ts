@@ -32,7 +32,6 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
 
   // Generate some constant records
   const startRecord = ihex.blockStartRecord(boardId);
-  const hexRecords = ihex.iHexToRecordStrs(iHexStr);
   let currentExtAddr = ihex.extLinAddressRecord(0);
 
   // Pre-calculate known record lengths
@@ -41,6 +40,8 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
   const endRecordBaseLen = ihex.blockEndRecord(0).length;
   const recordPaddingCapacity = ihex.recordPaddingCapacity();
   const padRecordBaseLen = ihex.paddedDataRecord(0).length;
+
+  const hexRecords = ihex.iHexToRecordStrs(iHexStr);
 
   // Each loop iteration corresponds to a 512-bytes block
   let ih = 0;
@@ -111,14 +112,23 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
 }
 
 function createFatBinary(hexes: { hex: string; boardID: number }[]): string {
-  const endOfFileRecord = ihex.endOfFileRecord() + '\n';
+  const eofRecord = ihex.endOfFileRecord();
+  const eofNlRecord = eofRecord + '\n';
   const customHexes: string[] = [];
-  // We remove the EoF record from all but the last hex file
+  // We remove the EoF record from all but the last hex file so that the last
+  // blocks are padded and there is single EoF record
   for (let i = 0; i < hexes.length - 1; i++) {
-    let customHex = iHexToCustomFormat(hexes[i].hex, hexes[i].boardID);
-    if (customHex.endsWith(endOfFileRecord)) {
-      customHex = customHex.slice(0, customHex.length - endOfFileRecord.length);
+    let customHex = hexes[i].hex;
+    if (customHex.endsWith(eofNlRecord)) {
+      customHex = customHex.slice(0, customHex.length - eofNlRecord.length);
+    } else if (customHex.endsWith(eofRecord)) {
+      customHex = customHex.slice(0, customHex.length - eofRecord.length);
+    } else {
+      throw Error(
+        `Could not fine the End Of File record on hex with Board ID ${hexes[i].boardID}`
+      );
     }
+    customHex = iHexToCustomFormat(customHex, hexes[i].boardID);
     customHexes.push(customHex);
   }
   // Process the last hex file with a guarantee EoF record
@@ -127,10 +137,10 @@ function createFatBinary(hexes: { hex: string; boardID: number }[]): string {
     hexes[hexes.length - 1].boardID
   );
   customHexes.push(lastCustomHex);
-  if (!lastCustomHex.endsWith(endOfFileRecord)) {
-    customHexes.push(endOfFileRecord);
+  if (!lastCustomHex.endsWith(eofNlRecord)) {
+    customHexes.push(eofNlRecord);
   }
-  return customHexes.join('\n');
+  return customHexes.join('');
 }
 
 export { iHexToCustomFormat, createFatBinary };
