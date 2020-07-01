@@ -1,7 +1,7 @@
 import * as ihex from '../ihex';
 
 describe('Test createRecord() for standard records', () => {
-  it('Create standard data records', () => {
+  it('Creates standard data records', () => {
     // Examples taken from a random micro:bit hex file
     expect(
       ihex.createRecord(
@@ -45,7 +45,7 @@ describe('Test createRecord() for standard records', () => {
     ).toEqual(':08E7D4000C1AFF7F0100000098');
   });
 
-  it('Create a custom End Of File record', () => {
+  it('Creates a custom End Of File record', () => {
     expect(
       ihex.createRecord(0, ihex.RecordType.EndOfFile, new Uint8Array([]))
     ).toEqual(':00000001FF');
@@ -77,7 +77,7 @@ describe('Test createRecord() for standard records', () => {
 });
 
 describe('Test createRecord() for custom records', () => {
-  it('Create a custom BlockStart record', () => {
+  it('Creates a custom BlockStart record', () => {
     expect(
       ihex.createRecord(
         0,
@@ -94,7 +94,7 @@ describe('Test createRecord() for custom records', () => {
 });
 
 describe('Test getRecordType() for standard records', () => {
-  it('Detect EoF record', () => {
+  it('Detects EoF record', () => {
     expect(ihex.getRecordType(':00000001FF')).toEqual(
       ihex.RecordType.EndOfFile
     );
@@ -118,16 +118,42 @@ describe('Test getRecordType() for standard records', () => {
 });
 
 describe('Test getRecordType() for custom records', () => {
-  it('Detect Block Start record', () => {
+  it('Detects Block Start record', () => {
     expect(ihex.getRecordType(':0400000A9901C0DEBA')).toEqual(
       ihex.RecordType.BlockStart
     );
   });
 
-  // TODO: Add tests for the BlockEnd record
-  // TODO: Add tests for the PaddedData record
-  // TODO: Add tests for the CustomData record
-  // TODO: Add tests for the OtherData record
+  it('Detects Block End record', () => {
+    expect(ihex.getRecordType(':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5')).toEqual(
+      ihex.RecordType.BlockEnd
+    );
+    expect(ihex.getRecordType(':0000000BF5')).toEqual(ihex.RecordType.BlockEnd);
+  });
+
+  it('Detects Padded Data record', () => {
+    expect(
+      ihex.getRecordType(':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4')
+    ).toEqual(ihex.RecordType.PaddedData);
+  });
+
+  it('Detects Custom Data record', () => {
+    expect(
+      ihex.getRecordType(':102AA00D34000F2D03653A35000C2D03653A3600C1')
+    ).toEqual(ihex.RecordType.CustomData);
+  });
+
+  it('Detects Other Data record', () => {
+    expect(
+      ihex.getRecordType(':1002800EE4EA519366D2B52AA5EE1DBDD0414C5578')
+    ).toEqual(ihex.RecordType.OtherData);
+  });
+
+  it('Throws error with invalid record type', () => {
+    expect(() => {
+      ihex.getRecordType(':0000000FF5');
+    }).toThrow('is not valid');
+  });
 });
 
 describe('Test parseRecord() for standard records', () => {
