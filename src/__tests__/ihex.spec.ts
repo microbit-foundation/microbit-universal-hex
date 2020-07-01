@@ -156,6 +156,34 @@ describe('Test getRecordType() for custom records', () => {
   });
 });
 
+describe('Test getRecordData()', () => {
+  it('Empty data field', () => {
+    expect(ihex.getRecordData(':00000001FF')).toEqual(new Uint8Array());
+  });
+
+  it('Get the data from a Block Start record', () => {
+    expect(ihex.getRecordData(':0400000A9903C0DEB8')).toEqual(
+      new Uint8Array([0x99, 0x03, 0xc0, 0xde])
+    );
+  });
+
+  it('Get the data from a full Padding record', () => {
+    expect(
+      ihex.getRecordData(':1080B00DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3')
+    ).toEqual(new Uint8Array(new Array(16).fill(0xff)));
+  });
+
+  it('Empty array when record is too short', () => {
+    expect(ihex.getRecordData(':00000001')).toEqual(new Uint8Array());
+  });
+
+  it('Throws error with invalid record', () => {
+    expect(() => {
+      ihex.getRecordData(':0000000F_THIS_IS_NOT_A_HEX_F5');
+    }).toThrow('Could not parse');
+  });
+});
+
 describe('Test parseRecord() for standard records', () => {
   it('Parses data records of different lengths', () => {
     let result = ihex.parseRecord(
@@ -230,6 +258,12 @@ describe('Test parseRecord() for standard records', () => {
     }).toThrow('byte count');
   });
 
+  it('Throws error when record is invalid', () => {
+    expect(() => {
+      ihex.parseRecord(':0000000F_THIS_IS_NOT_A_HEX_F5');
+    }).toThrow('Could not parse');
+  });
+
   // TODO: Add tests for parsing EoF records
   // TODO: Add tests for parsing ExtendedSegmentAddress records
   // TODO: Add tests for parsing StartSegmentAddress records
@@ -238,7 +272,7 @@ describe('Test parseRecord() for standard records', () => {
   // TODO: Add tests for parsing BlockStart records
 });
 
-describe('Test parseRecord() for standard records', () => {
+describe('Test parseRecord() for custom records', () => {
   // TODO: Add tests for parsing BlockStart records
   // TODO: Add tests for parsing BlockEnd records
   // TODO: Add tests for parsing PaddedData records

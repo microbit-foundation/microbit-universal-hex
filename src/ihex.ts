@@ -38,10 +38,15 @@ const RECORD_DATA_MAX_BYTES = 16;
  * Constants for the record character lengths.
  */
 const START_CODE_STR = ':';
+const START_CODE_INDEX = 0;
 const START_CODE_STR_LEN = START_CODE_STR.length;
+const BYTE_COUNT_STR_INDEX = START_CODE_INDEX + START_CODE_STR_LEN;
 const BYTE_COUNT_STR_LEN = 2;
+const ADDRESS_STR_INDEX = BYTE_COUNT_STR_INDEX + BYTE_COUNT_STR_LEN;
 const ADDRESS_STR_LEN = 4;
+const RECORD_TYPE_STR_INDEX = ADDRESS_STR_INDEX + ADDRESS_STR_LEN;
 const RECORD_TYPE_STR_LEN = 2;
+const DATA_STR_INDEX = RECORD_TYPE_STR_INDEX + RECORD_TYPE_STR_LEN;
 const DATA_STR_LEN_MIN = 0;
 const CHECKSUM_STR_LEN = 2;
 const MIN_RECORD_STR_LEN =
@@ -169,9 +174,28 @@ function getRecordType(iHexRecord: string): RecordType {
   );
   const recordType = parseInt(recordTypeStr, 16);
   if (!isRecordTypeValid(recordType)) {
-    throw new Error(`Record type '${recordTypeStr}' is not valid.`);
+    throw new Error(
+      `Record type '${recordTypeStr}' from record '${iHexRecord}' is not valid.`
+    );
   }
   return recordType;
+}
+
+/**
+ * Retrieves the data field from a record.
+ *
+ * @param iHexRecord Intel Hex record string.
+ * @returns The record Data in a byte array.
+ */
+function getRecordData(iHexRecord: string): Uint8Array {
+  try {
+    // The only thing after the Data bytes is the Checksum (2 characters)
+    return utils.hexStrToBytes(iHexRecord.slice(DATA_STR_INDEX, -2));
+  } catch (e) {
+    throw new Error(
+      `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
+    );
+  }
 }
 
 /**
@@ -360,6 +384,7 @@ export {
   RecordType,
   createRecord,
   getRecordType,
+  getRecordData,
   parseRecord,
   endOfFileRecord,
   extLinAddressRecord,
