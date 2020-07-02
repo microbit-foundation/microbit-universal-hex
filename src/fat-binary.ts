@@ -150,6 +150,12 @@ function createFatBinary(hexes: IndividualHex[]): string {
   return customHexes.join('');
 }
 
+/**
+ * Separates a Fat Binary into the individual hexes.
+ *
+ * @param intelHexStr Intel Hex string with the Fat Binary.
+ * @returns An array of object with boardId and hex keys.
+ */
 function separateFatBinary(intelHexStr: string): IndividualHex[] {
   const records = ihex.iHexToRecordStrs(intelHexStr);
   if (!records.length) throw new Error('Empty fat binary.');
@@ -198,7 +204,7 @@ function separateFatBinary(intelHexStr: string): IndividualHex[] {
         // Processes the Block Start record (only first 2 bytes for Board ID)
         const blockStartData = ihex.getRecordData(nextRecord);
         if (blockStartData.length !== 4) {
-          throw new Error(`Block Start record invalid: ${record}`);
+          throw new Error(`Block Start record invalid: ${nextRecord}`);
         }
         currentBoardId = (blockStartData[0] << 8) + blockStartData[1];
         hexes[currentBoardId] = hexes[currentBoardId] || {
@@ -215,6 +221,7 @@ function separateFatBinary(intelHexStr: string): IndividualHex[] {
     }
   }
 
+  // Form the return object with the same format as createFatBinary() input
   const returnArray: IndividualHex[] = [];
   Object.keys(hexes).forEach((boardId: string) => {
     // Ensure all hexes (and not just the last) contain the EoF record

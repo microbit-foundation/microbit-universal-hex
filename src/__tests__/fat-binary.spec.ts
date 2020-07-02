@@ -2,6 +2,20 @@ import * as fs from 'fs';
 
 import * as fb from '../fat-binary';
 
+const hex1 = fs.readFileSync(
+  './src/__tests__/hex-files/1-duck-umbrella.hex',
+  'utf8'
+);
+const hex2 = fs.readFileSync(
+  './src/__tests__/hex-files/2-ghost-music.hex',
+  'utf8'
+);
+
+const hexCombined = fs.readFileSync(
+  './src/__tests__/hex-files/combined-1-9901-2-9903.hex',
+  'utf8'
+);
+
 describe('Test iHexToCustomFormat()', () => {
   it('Pads blocks with additional records to reach 512 bytes', () => {
     const hexStr =
@@ -348,12 +362,19 @@ describe('Test iHexToCustomFormat()', () => {
   it('Empty Hex string produces an empty-ish output', () => {
     const result = fb.iHexToCustomFormat('', 0x9903);
 
-    expect(result).toEqual('\n');
+    expect(result).toEqual('');
   });
 });
 
-/*
-describe('Not real unit tests, just converting files for manual testing', () => {
+describe('Test createFatBinary()', () => {
+  it('Empty input equals empty output', () => {
+    const result = fb.createFatBinary([]);
+
+    expect(result).toEqual('');
+  });
+
+  /*
+  // Not real unit tests, just converting files for manual testing
   const hex1 = fs.readFileSync(
     './src/__tests__/hex-files/1-duck-umbrella.hex',
     'utf8'
@@ -381,5 +402,176 @@ describe('Not real unit tests, just converting files for manual testing', () => 
 
     expect('').toEqual('');
   });
-});
 */
+});
+
+describe('Separate fat binaries', () => {
+  it('Throws an error on empty input', () => {
+    expect(() => {
+      const result = fb.separateFatBinary('');
+    }).toThrow('Empty');
+  });
+
+  it('A normal hex cannot be separated.', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':10558000002EEDD1E9E70020EAE7C0464302F0B57E\n' +
+      ':1055900042005D0AC30F4802440A4800120E000E82\n' +
+      ':00000001FF\n';
+
+    expect(() => {
+      fb.separateFatBinary(normalHex);
+    }).toThrow('format invalid');
+  });
+
+  it('Throws error on malformed BlockStart.', () => {
+    const simpleBlock =
+      ':020000040003F7\n' +
+      ':0400000A9901BA\n' +
+      ':1056C0009946F600ED042E437F3F434642465D0275\n' +
+      ':1056D000D20F5B006D0A1B0E904640D0FF2B39D0D5\n' +
+      ':1056E00080220020ED00D20415437F3BFB18424688\n' +
+      ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
+      ':0000000BF5\n' +
+      ':00000001FF\n';
+
+    expect(() => {
+      fb.separateFatBinary(simpleBlock);
+    }).toThrow('Block Start record invalid: :0400000A9901BA');
+  });
+
+  it('Ensure all hexes have EoF records.', () => {
+    const firstBlock =
+      ':020000040002F8\n' +
+      ':0400000A9901C0DEBA\n' +
+      ':105620004802120E450A240EC90FFF2A17D0FF2C7C\n' +
+      ':1056300019D0002A0BD170427041002C17D00028DD\n' +
+      ':1056400007D048424141012049420843F0BD002CA7\n' +
+      ':1056500013D08B4214D0584201231843F6E702209E\n' +
+      ':10566000002EF3D1E3E70220002DEFD1E1E7002D7A\n' +
+      ':10567000E5D10020002EE9D0EDE7002DE9D1EAE7E1\n' +
+      ':10568000A242E8DC04DBAE42E5D80020AE42DDD227\n' +
+      ':105690005842434101205B421843D7E7F0B55746D3\n' +
+      ':1056A0004E4645464300E0B446028846760A1F0E41\n' +
+      ':1056B000C40F002F47D0FF2F25D0002380259A4606\n' +
+      ':06F80000FDFFFFFFFFFF0A\n' +
+      ':0000000BF5\n';
+    const firstHex =
+      ':020000040002F8\n' +
+      ':105620004802120E450A240EC90FFF2A17D0FF2C7C\n' +
+      ':1056300019D0002A0BD170427041002C17D00028DD\n' +
+      ':1056400007D048424141012049420843F0BD002CA7\n' +
+      ':1056500013D08B4214D0584201231843F6E702209E\n' +
+      ':10566000002EF3D1E3E70220002DEFD1E1E7002D7A\n' +
+      ':10567000E5D10020002EE9D0EDE7002DE9D1EAE7E1\n' +
+      ':10568000A242E8DC04DBAE42E5D80020AE42DDD227\n' +
+      ':105690005842434101205B421843D7E7F0B55746D3\n' +
+      ':1056A0004E4645464300E0B446028846760A1F0E41\n' +
+      ':1056B000C40F002F47D0FF2F25D0002380259A4606\n' +
+      ':06F80000FDFFFFFFFFFF0A\n' +
+      ':00000001FF\n';
+    const secondBlock =
+      ':020000040003F7\n' +
+      ':0400000A9903C0DEB8\n' +
+      ':1056C0009946F600ED042E437F3F434642465D0275\n' +
+      ':1056D000D20F5B006D0A1B0E904640D0FF2B39D0D5\n' +
+      ':1056E00080220020ED00D20415437F3BFB18424688\n' +
+      ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
+      ':0000000BF5\n' +
+      ':00000001FF\n';
+    const secondHex =
+      ':020000040003F7\n' +
+      ':1056C0009946F600ED042E437F3F434642465D0275\n' +
+      ':1056D000D20F5B006D0A1B0E904640D0FF2B39D0D5\n' +
+      ':1056E00080220020ED00D20415437F3BFB18424688\n' +
+      ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
+      ':00000001FF\n';
+
+    const result = fb.separateFatBinary(firstBlock + secondBlock);
+    expect(result[0].boardId).toEqual(0x9901);
+    expect(result[0].hex).toEqual(firstHex);
+    expect(result[1].boardId).toEqual(0x9903);
+    expect(result[1].hex).toEqual(secondHex);
+  });
+
+  it('Separate a full hex file', () => {
+    const result = fb.separateFatBinary(hexCombined);
+    // fs.writeFileSync(
+    //  './src/__tests__/hex-files/test-separate-0.hex',
+    //  result[0].hex
+    // );
+    // fs.writeFileSync(
+    //  './src/__tests__/hex-files/test-separate-1.hex',
+    //  result[1].hex
+    // );
+
+    expect(result[0].boardId).toEqual(0x9901);
+    expect(result[0].hex).toEqual(hex1);
+    expect(result[1].boardId).toEqual(0x9903);
+    // 2-ghost-music.hex does not open with the optional :020000040000FA record
+    expect(result[1].hex).toEqual(':020000040000FA\n' + hex2);
+  });
+});
+
+describe('Loopback hex to fat binaries', () => {
+  it('From a small sample', () => {
+    const hexStr =
+      ':020000040000FA\n' +
+      ':10558000002EEDD1E9E70020EAE7C0464302F0B57E\n' +
+      ':1055900042005D0AC30F4802440A4800120E000E82\n' +
+      ':1055A000C90FFF2A1FD0FF2822D0002A09D16E423E\n' +
+      ':1055B0006E4100280FD1002C0DD10020002D09D004\n' +
+      ':1055C00005E0002801D1002C01D08B4213D05842B5\n' +
+      ':1055D00001231843F0BD002EF7D04842414101207D\n' +
+      ':1055E00049420843F6E7002DDDD002204042F1E7B2\n' +
+      ':1055F000002CDAD0F9E78242E9DC04DBA542E6D8E8\n' +
+      ':105600000020A542E6D25842434101205B421843A4\n' +
+      // This Extended Linear Address record falls inside the first block
+      ':020000040002F8\n' +
+      ':10561000E0E7C0464302F0B542004C005E0AC30F0B\n' +
+      ':105620004802120E450A240EC90FFF2A17D0FF2C7C\n' +
+      ':1056300019D0002A0BD170427041002C17D00028DD\n' +
+      ':1056400007D048424141012049420843F0BD002CA7\n' +
+      ':1056500013D08B4214D0584201231843F6E702209E\n' +
+      ':10566000002EF3D1E3E70220002DEFD1E1E7002D7A\n' +
+      ':10567000E5D10020002EE9D0EDE7002DE9D1EAE7E1\n' +
+      ':10568000A242E8DC04DBAE42E5D80020AE42DDD227\n' +
+      ':105690005842434101205B421843D7E7F0B55746D3\n' +
+      ':1056A0004E4645464300E0B446028846760A1F0E41\n' +
+      ':1056B000C40F002F47D0FF2F25D0002380259A4606\n' +
+      ':06F80000FDFFFFFFFFFF0A\n' +
+      // This Extended Linear Address record falls as the first block record
+      ':020000040003F7\n' +
+      ':1056C0009946F600ED042E437F3F434642465D0275\n' +
+      ':1056D000D20F5B006D0A1B0E904640D0FF2B39D0D5\n' +
+      ':1056E00080220020ED00D20415437F3BFB18424688\n' +
+      ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
+      ':00000001FF\n';
+    const fatBinary = fb.iHexToCustomFormat(hexStr, 0x9901);
+
+    const result = fb.separateFatBinary(fatBinary);
+
+    expect(result[0].hex).toEqual(hexStr);
+  });
+
+  it('From full MakeCode files', () => {
+    const fatBinary = fb.createFatBinary([
+      {
+        hex: hex1,
+        boardId: 0x1,
+      },
+      {
+        hex: hex2,
+        boardId: 0x2,
+      },
+    ]);
+
+    const result = fb.separateFatBinary(fatBinary);
+
+    expect(result[0].boardId).toEqual(1);
+    expect(result[0].hex).toEqual(hex1);
+    expect(result[1].boardId).toEqual(2);
+    // 2-ghost-music.hex does not open with the optional :020000040000FA record
+    expect(result[1].hex).toEqual(':020000040000FA\n' + hex2);
+  });
+});
