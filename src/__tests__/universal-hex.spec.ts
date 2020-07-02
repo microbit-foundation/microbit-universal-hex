@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import * as fb from '../fat-binary';
+import * as uh from '../universal-hex';
 
 const hex1 = fs.readFileSync(
   './src/__tests__/hex-files/1-duck-umbrella.hex',
@@ -40,7 +40,7 @@ describe('Test iHexToCustomFormat()', () => {
       ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
       ':0400000BFFFFFFFFF5\n';
 
-    const result = fb.iHexToCustomFormat(hexStr, 0x9903);
+    const result = uh.iHexToCustomFormat(hexStr, 0x9903);
 
     expect(result).toEqual(expected);
     expect(result.length).toEqual(512);
@@ -78,7 +78,7 @@ describe('Test iHexToCustomFormat()', () => {
       ':0C10D000FFFFFFFF2D6D0300000000007B\n' +
       ':0000000BF5\n';
 
-    const result = fb.iHexToCustomFormat(hexStr, 0x9901);
+    const result = uh.iHexToCustomFormat(hexStr, 0x9901);
 
     expect(result).toEqual(expected);
     expect(result.length).toEqual(512);
@@ -131,7 +131,7 @@ describe('Test iHexToCustomFormat()', () => {
       ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4\n' +
       ':1000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5\n';
 
-    const result = fb.iHexToCustomFormat(hexStr, 0x9901);
+    const result = uh.iHexToCustomFormat(hexStr, 0x9901);
 
     expect(result).toEqual(expected);
     expect(result.length).toEqual(1024);
@@ -163,8 +163,8 @@ describe('Test iHexToCustomFormat()', () => {
     const expected9901 = [...expected9900];
     expected9901[1] = ':0400000A9901C0DEBA\n';
 
-    const result9900 = fb.iHexToCustomFormat(hexStr, 0x9900);
-    const result9901 = fb.iHexToCustomFormat(hexStr, 0x9901);
+    const result9900 = uh.iHexToCustomFormat(hexStr, 0x9900);
+    const result9901 = uh.iHexToCustomFormat(hexStr, 0x9901);
 
     expect(result9900).toEqual(expected9900.join(''));
     expect(result9900.length).toEqual(512);
@@ -199,11 +199,11 @@ describe('Test iHexToCustomFormat()', () => {
     const expectedFFFF = [...expected9903];
     expectedFFFF[1] = ':0400000AFFFFC0DE56\n';
 
-    const result9903 = fb.iHexToCustomFormat(hexStr, 0x9903);
-    const result9904 = fb.iHexToCustomFormat(hexStr, 0x9904);
-    const result9910 = fb.iHexToCustomFormat(hexStr, 0x9910);
-    const result0000 = fb.iHexToCustomFormat(hexStr, 0);
-    const resultFFFF = fb.iHexToCustomFormat(hexStr, 0xffff);
+    const result9903 = uh.iHexToCustomFormat(hexStr, 0x9903);
+    const result9904 = uh.iHexToCustomFormat(hexStr, 0x9904);
+    const result9910 = uh.iHexToCustomFormat(hexStr, 0x9910);
+    const result0000 = uh.iHexToCustomFormat(hexStr, 0);
+    const resultFFFF = uh.iHexToCustomFormat(hexStr, 0xffff);
 
     expect(result9903).toEqual(expected9903.join(''));
     expect(result9904).toEqual(expected9904.join(''));
@@ -230,7 +230,7 @@ describe('Test iHexToCustomFormat()', () => {
       ':0000000BF5\n' +
       ':00000001FF\n';
 
-    const result = fb.iHexToCustomFormat(hexStr, 0x9903);
+    const result = uh.iHexToCustomFormat(hexStr, 0x9903);
 
     expect(result).toEqual(expected);
   });
@@ -274,7 +274,7 @@ describe('Test iHexToCustomFormat()', () => {
       ':0000000BF5\n' +
       ':00000001FF\n';
 
-    const result = fb.iHexToCustomFormat(hexStr, 0x9901);
+    const result = uh.iHexToCustomFormat(hexStr, 0x9901);
 
     expect(result).toEqual(expected);
   });
@@ -354,21 +354,21 @@ describe('Test iHexToCustomFormat()', () => {
       ':0000000BF5\n' +
       ':00000001FF\n';
 
-    const result = fb.iHexToCustomFormat(hexStr, 0x9901);
+    const result = uh.iHexToCustomFormat(hexStr, 0x9901);
 
     expect(result).toEqual(expected);
   });
 
   it('Empty Hex string produces an empty-ish output', () => {
-    const result = fb.iHexToCustomFormat('', 0x9903);
+    const result = uh.iHexToCustomFormat('', 0x9903);
 
     expect(result).toEqual('');
   });
 });
 
-describe('Test createFatBinary()', () => {
+describe('Test createUniversalHex()', () => {
   it('Empty input equals empty output', () => {
-    const result = fb.createFatBinary([]);
+    const result = uh.createUniversalHex([]);
 
     expect(result).toEqual('');
   });
@@ -385,30 +385,30 @@ describe('Test createFatBinary()', () => {
   );
 
   it('.', () => {
-    const result1 = fb.iHexToCustomFormat(hex1, 0x9901);
+    const result1 = uh.iHexToCustomFormat(hex1, 0x9901);
     fs.writeFileSync('./src/__tests__/hex-files/test-output-1.hex', result1);
-    const result2 = fb.iHexToCustomFormat(hex2, 0x9903);
+    const result2 = uh.iHexToCustomFormat(hex2, 0x9903);
     fs.writeFileSync('./src/__tests__/hex-files/test-output-2.hex', result2);
 
     expect('').toEqual('');
   });
 
   it('..', () => {
-    const result = fb.createFatBinary([
+    const result = uh.createUniversalHex([
       { hex: hex1, boardID: 0x9901 },
       { hex: hex2, boardID: 0x9903 },
     ]);
-    fs.writeFileSync('./src/__tests__/hex-files/test-output-fat.hex', result);
+    fs.writeFileSync('./src/__tests__/hex-files/test-output-universal.hex', result);
 
     expect('').toEqual('');
   });
 */
 });
 
-describe('Separate fat binaries', () => {
+describe('Separate a Universal Hex', () => {
   it('Throws an error on empty input', () => {
     expect(() => {
-      const result = fb.separateFatBinary('');
+      const result = uh.separateUniversalHex('');
     }).toThrow('Empty');
   });
 
@@ -420,7 +420,7 @@ describe('Separate fat binaries', () => {
       ':00000001FF\n';
 
     expect(() => {
-      fb.separateFatBinary(normalHex);
+      uh.separateUniversalHex(normalHex);
     }).toThrow('format invalid');
   });
 
@@ -436,7 +436,7 @@ describe('Separate fat binaries', () => {
       ':00000001FF\n';
 
     expect(() => {
-      fb.separateFatBinary(simpleBlock);
+      uh.separateUniversalHex(simpleBlock);
     }).toThrow('Block Start record invalid: :0400000A9901BA');
   });
 
@@ -487,7 +487,7 @@ describe('Separate fat binaries', () => {
       ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
       ':00000001FF\n';
 
-    const result = fb.separateFatBinary(firstBlock + secondBlock);
+    const result = uh.separateUniversalHex(firstBlock + secondBlock);
     expect(result[0].boardId).toEqual(0x9901);
     expect(result[0].hex).toEqual(firstHex);
     expect(result[1].boardId).toEqual(0x9903);
@@ -495,7 +495,7 @@ describe('Separate fat binaries', () => {
   });
 
   it('Separate a full hex file', () => {
-    const result = fb.separateFatBinary(hexCombined);
+    const result = uh.separateUniversalHex(hexCombined);
     // fs.writeFileSync(
     //  './src/__tests__/hex-files/test-separate-0.hex',
     //  result[0].hex
@@ -513,7 +513,7 @@ describe('Separate fat binaries', () => {
   });
 });
 
-describe('Loopback hex to fat binaries', () => {
+describe('Loopback Intel Hex to Universal Hex', () => {
   it('From a small sample', () => {
     const hexStr =
       ':020000040000FA\n' +
@@ -547,15 +547,15 @@ describe('Loopback hex to fat binaries', () => {
       ':1056E00080220020ED00D20415437F3BFB18424688\n' +
       ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
       ':00000001FF\n';
-    const fatBinary = fb.iHexToCustomFormat(hexStr, 0x9901);
+    const universalHex = uh.iHexToCustomFormat(hexStr, 0x9901);
 
-    const result = fb.separateFatBinary(fatBinary);
+    const result = uh.separateUniversalHex(universalHex);
 
     expect(result[0].hex).toEqual(hexStr);
   });
 
   it('From full MakeCode files', () => {
-    const fatBinary = fb.createFatBinary([
+    const universalHex = uh.createUniversalHex([
       {
         hex: hex1,
         boardId: 0x1,
@@ -566,7 +566,7 @@ describe('Loopback hex to fat binaries', () => {
       },
     ]);
 
-    const result = fb.separateFatBinary(fatBinary);
+    const result = uh.separateUniversalHex(universalHex);
 
     expect(result[0].boardId).toEqual(1);
     expect(result[0].hex).toEqual(hex1);

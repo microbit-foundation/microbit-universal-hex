@@ -1,24 +1,24 @@
 {
-  "name": "@microbit-foundation/microbit-fb",
+  "name": "@microbit-foundation/microbit-universal-hex",
   "version": "0.1.0",
-  "description": "Create micro:bit fat binaries.",
+  "description": "Create micro:bit Universal Hexes.",
   "keywords": [
     "microbit",
-    "fat-binary",
-    "fat binary",
-    "fb"
+    "universal-hex",
+    "universal hex",
+    "uh"
   ],
-  "main": "./dist/bundles/microbit-fb.umd.js",
-  "mainMin": "./dist/bundles/microbit-fb.umd.min.js",
+  "main": "./dist/bundles/microbit-uh.umd.js",
+  "mainMin": "./dist/bundles/microbit-uh.umd.min.js",
   "module": "./dist/esm5/index.js",
   "typings": "./dist/types/index.d.ts",
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/microbit-foundation/microbit-fb"
+    "url": "https://github.com/microbit-foundation/microbit-universal-hex"
   },
   "config": {
-    "umdName": "microbitFb"
+    "umdName": "microbitUh"
   },
   "author": "Micro:bit Educational Foundation <package-help@microbit.org>",
   "license": "MIT",

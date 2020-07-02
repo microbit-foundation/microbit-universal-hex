@@ -1,6 +1,6 @@
 import * as utils from './utils';
 
-/** Values for the Record Type field, including fat-binaries custom types. */
+/** Values for the Record Type field, including Universal Hex custom types. */
 enum RecordType {
   Data = 0x00,
   EndOfFile = 0x01,
@@ -104,7 +104,7 @@ function calcChecksumByte(dataBytes: Uint8Array): number {
  *
  * @param address - The two least significant bytes for the data address.
  * @param recordType - Record type, could be one of the standard types or any
- *    of the custom types created for forming fat binaries.
+ *    of the custom types created for forming a Universal Hex.
  * @param dataBytes - Byte array with the data to include in the record.
  * @returns A string with the Intel Hex record.
  */

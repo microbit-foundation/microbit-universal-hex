@@ -1,8 +1,8 @@
 /**
- * Converts standard Intel Hex strings into fat binaries with records organised
- * in self contained 512-byte blocks.
+ * Converts standard Intel Hex strings into a Universal Hex with records
+ * organised in self contained 512-byte blocks.
  *
- * (c) 2020 Micro:bit Educational Foundation and the microbit-fb contributors.
+ * (c) 2020 Micro:bit Educational Foundation and the project contributors.
  * SPDX-License-Identifier: MIT
  */
 import * as ihex from './ihex';
@@ -16,7 +16,7 @@ interface IndividualHex {
 }
 
 /**
- * Converts a hex file string into a fat-binary ready hex string using custom
+ * Converts a hex file string into a Universal Hex ready hex string using custom
  * records and 512 byte blocks.
  *
  * Block format:
@@ -116,7 +116,7 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
   return blockLines.length ? blockLines.join('\n') + '\n' : '';
 }
 
-function createFatBinary(hexes: IndividualHex[]): string {
+function createUniversalHex(hexes: IndividualHex[]): string {
   if (!hexes.length) return '';
 
   const eofRecord = ihex.endOfFileRecord();
@@ -151,14 +151,14 @@ function createFatBinary(hexes: IndividualHex[]): string {
 }
 
 /**
- * Separates a Fat Binary into the individual hexes.
+ * Separates a Universal Hex into the individual hexes.
  *
- * @param intelHexStr Intel Hex string with the Fat Binary.
+ * @param intelHexStr Intel Hex string with the Universal Hex.
  * @returns An array of object with boardId and hex keys.
  */
-function separateFatBinary(intelHexStr: string): IndividualHex[] {
+function separateUniversalHex(intelHexStr: string): IndividualHex[] {
   const records = ihex.iHexToRecordStrs(intelHexStr);
-  if (!records.length) throw new Error('Empty fat binary.');
+  if (!records.length) throw new Error('Empty Universal Hex.');
 
   // The format has to start with an Extended Linear Address and Block Start
   if (
@@ -167,7 +167,7 @@ function separateFatBinary(intelHexStr: string): IndividualHex[] {
     ihex.getRecordType(records[records.length - 1]) !==
       ihex.RecordType.EndOfFile
   ) {
-    throw new Error('Fat binary block format invalid.');
+    throw new Error('Universal Hex block format invalid.');
   }
 
   const passThroughRecords = [
@@ -221,7 +221,7 @@ function separateFatBinary(intelHexStr: string): IndividualHex[] {
     }
   }
 
-  // Form the return object with the same format as createFatBinary() input
+  // Form the return object with the same format as createUniversalHex() input
   const returnArray: IndividualHex[] = [];
   Object.keys(hexes).forEach((boardId: string) => {
     // Ensure all hexes (and not just the last) contain the EoF record
@@ -237,4 +237,4 @@ function separateFatBinary(intelHexStr: string): IndividualHex[] {
   return returnArray;
 }
 
-export { iHexToCustomFormat, createFatBinary, separateFatBinary };
+export { iHexToCustomFormat, createUniversalHex, separateUniversalHex };

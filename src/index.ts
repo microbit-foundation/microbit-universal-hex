@@ -1,1 +1,1 @@
-export * from './fat-binary';
+export * from './universal-hex';
