@@ -59,7 +59,14 @@ export function byteToHexStrFast(byte: number) {
   return byte.toString(16).toUpperCase().padStart(2, '0');
 }
 
-// TODO: Docstring
+/**
+ * Converts a Uint8Array into a string with base 16 hex digits. It doesn't
+ * include an opening '0x'.
+ *
+ * @export
+ * @param byteArray Uint8Array to convert to hex.
+ * @returns String with base 16 hex digits.
+ */
 export function byteArrayToHexStr(byteArray: Uint8Array): string {
   return byteArray.reduce(
     (accumulator, current) =>
@@ -68,14 +75,20 @@ export function byteArrayToHexStr(byteArray: Uint8Array): string {
   );
 }
 
-// TODO: Docstring
-export function concatUint8Arrays(arrayToConcat: Uint8Array[]): Uint8Array {
-  const fullLength = arrayToConcat.reduce(
+/**
+ * Concatenates an array of Uint8Arrays into a single Uint8Array.
+ *
+ * @export
+ * @param arraysToConcat Arrays to concatenate.
+ * @returns Single concatenated Uint8Array.
+ */
+export function concatUint8Arrays(arraysToConcat: Uint8Array[]): Uint8Array {
+  const fullLength = arraysToConcat.reduce(
     (accumulator, currentValue) => accumulator + currentValue.length,
     0
   );
   const combined: Uint8Array = new Uint8Array(fullLength);
-  arrayToConcat.reduce((accumulator, currentArray) => {
+  arraysToConcat.reduce((accumulator, currentArray) => {
     combined.set(currentArray, accumulator);
     return accumulator + currentArray.length;
   }, 0);
