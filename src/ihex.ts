@@ -351,13 +351,13 @@ function paddedDataRecord(padBytesLen: number): string {
  * @param iHexRecord Intel hex record line without line terminator.
  * @returns A Custom Data Intel Hex record with the same data field.
  */
-function convertRecordToCustomData(iHexRecord: string): string {
+function convertRecordTo(iHexRecord: string, recordType: RecordType): string {
   const oRecord = parseRecord(iHexRecord);
   const recordContent: Uint8Array = new Uint8Array(oRecord.data.length + 4);
   recordContent[0] = oRecord.data.length;
   recordContent[1] = oRecord.address >> 8;
   recordContent[2] = oRecord.address & 0xff;
-  recordContent[3] = RecordType.CustomData;
+  recordContent[3] = recordType;
   recordContent.set(oRecord.data, 4);
   const recordContentStr = utils.byteArrayToHexStr(recordContent);
   const checksumStr = utils.byteToHexStrFast(calcChecksumByte(recordContent));
@@ -392,6 +392,6 @@ export {
   blockEndRecord,
   paddedDataRecord,
   recordPaddingCapacity,
-  convertRecordToCustomData,
+  convertRecordTo,
   iHexToRecordStrs,
 };

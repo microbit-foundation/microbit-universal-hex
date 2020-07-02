@@ -10,6 +10,11 @@ import * as ihex from './ihex';
 const V1_BOARD_IDS = [0x9900, 0x9901];
 const BLOCK_SIZE = 512;
 
+interface IndividualHex {
+  hex: string;
+  boardId: number;
+}
+
 /**
  * Converts a hex file string into a fat-binary ready hex string using custom
  * records and 512 byte blocks.
@@ -68,7 +73,7 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
       let record = hexRecords[ih++];
       const recordType = ihex.getRecordType(record);
       if (replaceDataRecord && recordType === ihex.RecordType.Data) {
-        record = ihex.convertRecordToCustomData(record);
+        record = ihex.convertRecordTo(record, ihex.RecordType.CustomData);
       } else if (recordType === ihex.RecordType.ExtendedLinearAddress) {
         currentExtAddr = record;
       } else if (recordType === ihex.RecordType.EndOfFile) {
@@ -103,15 +108,17 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
         blockLines.push(record);
         blockLen += record.length + 1;
       }
-      // TODO: Can we have a block that needs an odd number of padded chars?
+      // TODO: Can we end up with a block needing an odd number of padded chars?
       blockLines.push(ihex.blockEndRecord((BLOCK_SIZE - blockLen) / 2));
     }
   }
 
-  return blockLines.join('\n') + '\n';
+  return blockLines.length ? blockLines.join('\n') + '\n' : '';
 }
 
-function createFatBinary(hexes: { hex: string; boardID: number }[]): string {
+function createFatBinary(hexes: IndividualHex[]): string {
+  if (!hexes.length) return '';
+
   const eofRecord = ihex.endOfFileRecord();
   const eofNlRecord = eofRecord + '\n';
   const customHexes: string[] = [];
@@ -125,16 +132,16 @@ function createFatBinary(hexes: { hex: string; boardID: number }[]): string {
       customHex = customHex.slice(0, customHex.length - eofRecord.length);
     } else {
       throw Error(
-        `Could not fine the End Of File record on hex with Board ID ${hexes[i].boardID}`
+        `Could not fine the End Of File record on hex with Board ID ${hexes[i].boardId}`
       );
     }
-    customHex = iHexToCustomFormat(customHex, hexes[i].boardID);
+    customHex = iHexToCustomFormat(customHex, hexes[i].boardId);
     customHexes.push(customHex);
   }
   // Process the last hex file with a guarantee EoF record
   const lastCustomHex = iHexToCustomFormat(
     hexes[hexes.length - 1].hex,
-    hexes[hexes.length - 1].boardID
+    hexes[hexes.length - 1].boardId
   );
   customHexes.push(lastCustomHex);
   if (!lastCustomHex.endsWith(eofNlRecord)) {
@@ -143,4 +150,84 @@ function createFatBinary(hexes: { hex: string; boardID: number }[]): string {
   return customHexes.join('');
 }
 
-export { iHexToCustomFormat, createFatBinary };
+function separateFatBinary(intelHexStr: string): IndividualHex[] {
+  const records = ihex.iHexToRecordStrs(intelHexStr);
+  if (!records.length) throw new Error('Empty fat binary.');
+
+  // The format has to start with an Extended Linear Address and Block Start
+  if (
+    ihex.getRecordType(records[0]) !== ihex.RecordType.ExtendedLinearAddress ||
+    ihex.getRecordType(records[1]) !== ihex.RecordType.BlockStart ||
+    ihex.getRecordType(records[records.length - 1]) !==
+      ihex.RecordType.EndOfFile
+  ) {
+    throw new Error('Fat binary block format invalid.');
+  }
+
+  const passThroughRecords = [
+    ihex.RecordType.Data,
+    ihex.RecordType.EndOfFile,
+    ihex.RecordType.ExtendedSegmentAddress,
+    ihex.RecordType.StartSegmentAddress,
+  ];
+
+  // Initialise the structure to hold the different hexes
+  const hexes: {
+    [boarId: string]: {
+      boardId: number;
+      lastExtAdd: string;
+      hex: string[];
+    };
+  } = {};
+  let currentBoardId = 0;
+  for (let i = 0; i < records.length; i++) {
+    const record = records[i];
+    const recordType = ihex.getRecordType(record);
+    if (passThroughRecords.includes(recordType)) {
+      hexes[currentBoardId].hex.push(record);
+    } else if (recordType === ihex.RecordType.CustomData) {
+      hexes[currentBoardId].hex.push(
+        ihex.convertRecordTo(record, ihex.RecordType.Data)
+      );
+    } else if (recordType === ihex.RecordType.ExtendedLinearAddress) {
+      // Extended Linear Address can be found as the start of a new block
+      // No need to check array size as we known there will always be an EoF
+      const nextRecord = records[i + 1];
+      const nextRecordType = ihex.getRecordType(nextRecord);
+      if (nextRecordType === ihex.RecordType.BlockStart) {
+        // Processes the Block Start record (only first 2 bytes for Board ID)
+        const blockStartData = ihex.getRecordData(nextRecord);
+        if (blockStartData.length !== 4) {
+          throw new Error(`Block Start record invalid: ${record}`);
+        }
+        currentBoardId = (blockStartData[0] << 8) + blockStartData[1];
+        hexes[currentBoardId] = hexes[currentBoardId] || {
+          boardId: currentBoardId,
+          lastExtAdd: record,
+          hex: [record],
+        };
+        i++;
+      }
+      if (hexes[currentBoardId].lastExtAdd !== record) {
+        hexes[currentBoardId].lastExtAdd = record;
+        hexes[currentBoardId].hex.push(record);
+      }
+    }
+  }
+
+  const returnArray: IndividualHex[] = [];
+  Object.keys(hexes).forEach((boardId: string) => {
+    // Ensure all hexes (and not just the last) contain the EoF record
+    const hex = hexes[boardId].hex;
+    if (hex[hex.length - 1] !== ihex.endOfFileRecord()) {
+      hex[hex.length] = ihex.endOfFileRecord();
+    }
+    returnArray.push({
+      boardId: hexes[boardId].boardId,
+      hex: hex.join('\n') + '\n',
+    });
+  });
+  return returnArray;
+}
+
+export { iHexToCustomFormat, createFatBinary, separateFatBinary };

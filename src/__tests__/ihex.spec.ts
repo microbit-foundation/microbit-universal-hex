@@ -370,17 +370,19 @@ describe('Test paddedDataRecord()', () => {
   });
 });
 
-describe('Test convertRecordToCustomData()', () => {
+describe('Test convertRecordTo()', () => {
   it('Converts a Data Record into a Custom Data Record', () => {
     expect(
-      ihex.convertRecordToCustomData(
-        ':105D3000E060E3802046FFF765FF0123A1881A4653'
+      ihex.convertRecordTo(
+        ':105D3000E060E3802046FFF765FF0123A1881A4653',
+        ihex.RecordType.CustomData
       )
     ).toEqual(':105D300DE060E3802046FFF765FF0123A1881A4646');
 
     expect(
-      ihex.convertRecordToCustomData(
-        ':10B04000D90B08BD40420F0070B5044616460D46A8'
+      ihex.convertRecordTo(
+        ':10B04000D90B08BD40420F0070B5044616460D46A8',
+        ihex.RecordType.CustomData
       )
     ).toEqual(':10B0400DD90B08BD40420F0070B5044616460D469B');
   });
