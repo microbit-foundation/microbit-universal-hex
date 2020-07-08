@@ -405,6 +405,84 @@ describe('Test createUniversalHex()', () => {
 */
 });
 
+describe('Test isUniversalHex()', () => {
+  it('Detects a Universal Intel Hex.', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':0400000A9900C0DEBB\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n' +
+      ':00000001FF\n';
+
+    const result = uh.isUniversalHex(normalHex);
+
+    expect(result).toBeTruthy();
+  });
+
+  it('Detects a Universal Intel Hex with Windows line endings.', () => {
+    const normalHex =
+      ':020000040000FA\r\n' +
+      ':0400000A9900C0DEBB\r\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\r\n' +
+      ':1000100000000000000000000000000000000000E0\r\n' +
+      ':10002000000000000000000000000000618E0100E0\r\n' +
+      ':100030000000000000000000638E0100658E0100DA\r\n' +
+      ':10004000678E01005D3D000065950100678E01002F\r\n' +
+      ':10005000678E010000000000218F0100678E010003\r\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\r\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\r\n' +
+      ':10008000678E0100678E0100678E0100678E010098\r\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\r\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\r\n' +
+      ':00000001FF\r\n';
+
+    const result = uh.isUniversalHex(normalHex);
+
+    expect(result).toBeTruthy();
+  });
+
+  it('Detects an empty string as false', () => {
+    expect(uh.isUniversalHex('')).toBeFalsy();
+  });
+
+  it('Detects a normal Intel Hex as false.', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':10558000002EEDD1E9E70020EAE7C0464302F0B57E\n' +
+      ':1055900042005D0AC30F4802440A4800120E000E82\n' +
+      ':00000001FF\n';
+
+    const result = uh.isUniversalHex(normalHex);
+
+    expect(result).toBeFalsy();
+  });
+
+  it('Detects a random string as false.', () => {
+    const normalHex = 'This is just a random string';
+
+    const result = uh.isUniversalHex(normalHex);
+
+    expect(result).toBeFalsy();
+  });
+
+  it('Returns false when failing to find the second record.', () => {
+    const normalHex = ':02000004\nThis is just a random string, nor a record.';
+
+    const result = uh.isUniversalHex(normalHex);
+
+    expect(result).toBeFalsy();
+  });
+});
+
 describe('Separate a Universal Hex', () => {
   it('Throws an error on empty input', () => {
     expect(() => {

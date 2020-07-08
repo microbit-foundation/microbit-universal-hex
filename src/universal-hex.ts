@@ -151,13 +151,42 @@ function createUniversalHex(hexes: IndividualHex[]): string {
 }
 
 /**
+ * Checks if the provided hex string is a fat binary.
+ *
+ * Very simple test only checking for the opening Extended Linear Address and
+ * Block Start records.
+ *
+ * The string is manually checked as this method can be x20 faster than breaking
+ * the string into records and checking their types with the ihex functions.
+ *
+ * @param hexStr Hex string to check
+ * @return True if the hex is an Universal Hex.
+ */
+function isUniversalHex(hexStr: string): boolean {
+  // Check the beginning of the Extended Linear Address record
+  const startOfElaRecord = ':02000004';
+  if (hexStr.slice(0, startOfElaRecord.length) !== startOfElaRecord) {
+    return false;
+  }
+  // Find the index for the next record, as we have unknown line endings
+  let i = startOfElaRecord.length;
+  while (hexStr[++i] !== ':' && i < 50);
+  // Check the beginning of the Block Start record
+  const startOfBsRecord = ':0400000A';
+  if (hexStr.slice(i, i + startOfBsRecord.length) !== startOfBsRecord) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Separates a Universal Hex into the individual hexes.
  *
- * @param intelHexStr Intel Hex string with the Universal Hex.
+ * @param universalHexStr Universal Hex string with the Universal Hex.
  * @returns An array of object with boardId and hex keys.
  */
-function separateUniversalHex(intelHexStr: string): IndividualHex[] {
-  const records = ihex.iHexToRecordStrs(intelHexStr);
+function separateUniversalHex(universalHexStr: string): IndividualHex[] {
+  const records = ihex.iHexToRecordStrs(universalHexStr);
   if (!records.length) throw new Error('Empty Universal Hex.');
 
   // The format has to start with an Extended Linear Address and Block Start
@@ -237,4 +266,9 @@ function separateUniversalHex(intelHexStr: string): IndividualHex[] {
   return returnArray;
 }
 
-export { iHexToCustomFormat, createUniversalHex, separateUniversalHex };
+export {
+  iHexToCustomFormat,
+  createUniversalHex,
+  isUniversalHex,
+  separateUniversalHex,
+};
