@@ -23,7 +23,7 @@ interface IndividualHex {
  *  - Extended linear address record
  *
  * More information on the format:
- *  https://github.com/microbit-foundation/fat-binaries
+ *  https://github.com/microbit-foundation/universal-hex
  *
  * @throws {Error} When the Board ID is not between 0 and 2^16.
  *
@@ -151,7 +151,7 @@ function createUniversalHex(hexes: IndividualHex[]): string {
 }
 
 /**
- * Checks if the provided hex string is a fat binary.
+ * Checks if the provided hex string is a universal hex.
  *
  * Very simple test only checking for the opening Extended Linear Address and
  * Block Start records.
