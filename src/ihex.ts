@@ -30,9 +30,9 @@ interface Record {
 
 /**
  * The maximum data bytes per record is 0xFF, 16 and 32 bytes are the two most
- * common lengths, but to start we'll only support 16 bytes
+ * common lengths, but DAPLink doesn't support more than 32 bytes.
  */
-const RECORD_DATA_MAX_BYTES = 16;
+const RECORD_DATA_MAX_BYTES = 32;
 
 /**
  * Constants for the record character lengths.
@@ -319,16 +319,6 @@ function blockEndRecord(padBytesLen: number): string {
 }
 
 /**
- * The Block end record can add bytes to the data field to be generate 512 byte
- * blocks. This function exposes how many bytes the record can fit.
- *
- * @returns Number of padding bytes that fit inside a Block End (custom) Record.
- */
-function recordPaddingCapacity(): number {
-  return RECORD_DATA_MAX_BYTES;
-}
-
-/**
  * Create a Padded Data (custom) Intel Hex Record.
  * This record is used to add padding data, to be ignored by DAPLink, to be able
  * to create blocks of 512-bytes.
@@ -380,7 +370,42 @@ function iHexToRecordStrs(iHexStr: string): string[] {
   return output.filter(Boolean);
 }
 
+/**
+ * Iterates through the beginning of an array of Intel Hex records to find the
+ * longest record data field length.
+ *
+ * Once it finds 10 records at the maximum size found so far (starts at 16
+ * bytes) it will stop iterating.
+ *
+ * This is useful to identify the expected max size of the data records for an
+ * Intel Hex, and then be able to generate new custom records of the same size.
+ *
+ * @param iHexRecords Array of Intel Hex Records
+ * @returns Number of data bytes th
+ */
+function findDataFieldLength(iHexRecords: string[]): number {
+  let maxDataBytes = 16;
+  let maxDataBytesCount = 0;
+  for (const record of iHexRecords) {
+    const dataBytesLength = (record.length - MIN_RECORD_STR_LEN) / 2;
+    if (dataBytesLength > maxDataBytes) {
+      maxDataBytes = dataBytesLength;
+      maxDataBytesCount = 0;
+    } else if (dataBytesLength === maxDataBytes) {
+      maxDataBytesCount++;
+    }
+    if (maxDataBytesCount > 10) {
+      break;
+    }
+  }
+  if (maxDataBytes > RECORD_DATA_MAX_BYTES) {
+    throw new Error(`Intel Hex record data size is too large: ${maxDataBytes}`);
+  }
+  return maxDataBytes;
+}
+
 export {
+  MAX_RECORD_STR_LEN,
   RecordType,
   createRecord,
   getRecordType,
@@ -391,7 +416,7 @@ export {
   blockStartRecord,
   blockEndRecord,
   paddedDataRecord,
-  recordPaddingCapacity,
   convertRecordTo,
   iHexToRecordStrs,
+  findDataFieldLength,
 };

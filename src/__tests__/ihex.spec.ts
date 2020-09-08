@@ -57,9 +57,16 @@ describe('Test createRecord() for standard records', () => {
   // TODO: Add tests for the StartLinearAddress record
 
   it('Throws error when data given is too large', () => {
+    let data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
+    data = data.concat(data);
     expect(() => {
-      const d = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
-      ihex.createRecord(0, ihex.RecordType.Data, new Uint8Array(d));
+      ihex.createRecord(0, ihex.RecordType.Data, new Uint8Array(data));
+    }).not.toThrow();
+
+    data.push(33);
+
+    expect(() => {
+      ihex.createRecord(0, ihex.RecordType.Data, new Uint8Array(data));
     }).toThrow();
   });
 
@@ -336,14 +343,12 @@ describe('Test blockEndRecord()', () => {
 
   it('Throws error when the number of bytes to pad is too large', () => {
     expect(() => {
-      ihex.blockEndRecord(17);
-    }).toThrow('has too many bytes');
-  });
-});
+      ihex.blockEndRecord(32);
+    }).not.toThrow('has too many bytes');
 
-describe('Test recordPaddingCapacity()', () => {
-  it('Check return value is 0x10', () => {
-    expect(ihex.recordPaddingCapacity()).toEqual(16);
+    expect(() => {
+      ihex.blockEndRecord(33);
+    }).toThrow('has too many bytes');
   });
 });
 
@@ -365,7 +370,11 @@ describe('Test paddedDataRecord()', () => {
 
   it('Throws error when the number of bytes to pad is too large', () => {
     expect(() => {
-      ihex.paddedDataRecord(17);
+      ihex.paddedDataRecord(32);
+    }).not.toThrow('has too many bytes');
+
+    expect(() => {
+      ihex.paddedDataRecord(33);
     }).toThrow('has too many bytes');
   });
 });

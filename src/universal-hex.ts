@@ -16,7 +16,7 @@ interface IndividualHex {
 }
 
 /**
- * Converts a hex file string into a Universal Hex ready hex string using custom
+ * Converts an Intel Hex file string into a Universal Hex ready hex string using custom
  * records and 512 byte blocks.
  *
  * Block format:
@@ -43,10 +43,10 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
   const extAddrRecordLen = currentExtAddr.length;
   const startRecordLen = startRecord.length;
   const endRecordBaseLen = ihex.blockEndRecord(0).length;
-  const recordPaddingCapacity = ihex.recordPaddingCapacity();
   const padRecordBaseLen = ihex.paddedDataRecord(0).length;
 
   const hexRecords = ihex.iHexToRecordStrs(iHexStr);
+  const recordPaddingCapacity = ihex.findDataFieldLength(hexRecords);
 
   // Each loop iteration corresponds to a 512-bytes block
   let ih = 0;
@@ -164,16 +164,16 @@ function createUniversalHex(hexes: IndividualHex[]): string {
  */
 function isUniversalHex(hexStr: string): boolean {
   // Check the beginning of the Extended Linear Address record
-  const startOfElaRecord = ':02000004';
-  if (hexStr.slice(0, startOfElaRecord.length) !== startOfElaRecord) {
+  const elaRecordBeginning = ':02000004';
+  if (hexStr.slice(0, elaRecordBeginning.length) !== elaRecordBeginning) {
     return false;
   }
   // Find the index for the next record, as we have unknown line endings
-  let i = startOfElaRecord.length;
-  while (hexStr[++i] !== ':' && i < 50);
+  let i = elaRecordBeginning.length;
+  while (hexStr[++i] !== ':' && i < ihex.MAX_RECORD_STR_LEN + 3);
   // Check the beginning of the Block Start record
-  const startOfBsRecord = ':0400000A';
-  if (hexStr.slice(i, i + startOfBsRecord.length) !== startOfBsRecord) {
+  const blockStartBeginning = ':0400000A';
+  if (hexStr.slice(i, i + blockStartBeginning.length) !== blockStartBeginning) {
     return false;
   }
   return true;

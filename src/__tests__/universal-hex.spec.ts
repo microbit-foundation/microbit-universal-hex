@@ -3,11 +3,11 @@ import * as fs from 'fs';
 import * as uh from '../universal-hex';
 
 const hex1 = fs.readFileSync(
-  './src/__tests__/hex-files/1-duck-umbrella.hex',
+  './src/__tests__/hex-files/1-duck-umbrella-16.hex',
   'utf8'
 );
 const hex2 = fs.readFileSync(
-  './src/__tests__/hex-files/2-ghost-music.hex',
+  './src/__tests__/hex-files/2-ghost-music-16.hex',
   'utf8'
 );
 
@@ -375,30 +375,58 @@ describe('Test createUniversalHex()', () => {
 
   /*
   // Not real unit tests, just converting files for manual testing
-  const hex1 = fs.readFileSync(
-    './src/__tests__/hex-files/1-duck-umbrella.hex',
+  const hex1_32 = fs.readFileSync(
+    './src/__tests__/hex-files/1-duck-umbrella-32.hex',
     'utf8'
   );
-  const hex2 = fs.readFileSync(
-    './src/__tests__/hex-files/2-ghost-music.hex',
+  const hex2_32 = fs.readFileSync(
+    './src/__tests__/hex-files/2-ghost-music-32.hex',
     'utf8'
   );
 
-  it('.', () => {
-    const result1 = uh.iHexToCustomFormat(hex1, 0x9901);
-    fs.writeFileSync('./src/__tests__/hex-files/test-output-1.hex', result1);
-    const result2 = uh.iHexToCustomFormat(hex2, 0x9903);
-    fs.writeFileSync('./src/__tests__/hex-files/test-output-2.hex', result2);
+  it('Creates Universal Hex files for a single target', () => {
+    const result1_16 = uh.iHexToCustomFormat(hex1, 0x9901);
+    fs.writeFileSync(
+      './src/__tests__/hex-files/test-output-1-16.hex',
+      result1_16
+    );
+    const result2_16 = uh.iHexToCustomFormat(hex2, 0x9903);
+    fs.writeFileSync(
+      './src/__tests__/hex-files/test-output-2-16.hex',
+      result2_16
+    );
+    const result1_32 = uh.iHexToCustomFormat(hex1_32, 0x9901);
+    fs.writeFileSync(
+      './src/__tests__/hex-files/test-output-1-32.hex',
+      result1_32
+    );
+    const result2_32 = uh.iHexToCustomFormat(hex2_32, 0x9903);
+    fs.writeFileSync(
+      './src/__tests__/hex-files/test-output-2-32.hex',
+      result2_32
+    );
 
     expect('').toEqual('');
   });
 
-  it('..', () => {
+  it('Creates a combined universal hex file for both targets', () => {
     const result = uh.createUniversalHex([
-      { hex: hex1, boardID: 0x9901 },
-      { hex: hex2, boardID: 0x9903 },
+      { hex: hex1, boardId: 0x9900 },
+      { hex: hex2, boardId: 0x9903 },
     ]);
-    fs.writeFileSync('./src/__tests__/hex-files/test-output-universal.hex', result);
+    fs.writeFileSync(
+      './src/__tests__/hex-files/test-output-universal-16.hex',
+      result
+    );
+
+    const result32 = uh.createUniversalHex([
+      { hex: hex1_32, boardId: 0x9900 },
+      { hex: hex2_32, boardId: 0x9903 },
+    ]);
+    fs.writeFileSync(
+      './src/__tests__/hex-files/test-output-universal-32.hex',
+      result32
+    );
 
     expect('').toEqual('');
   });
