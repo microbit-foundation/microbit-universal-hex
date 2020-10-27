@@ -1,3 +1,9 @@
+/**
+ * Tests for utilities.
+ *
+ * (c) 2020 Micro:bit Educational Foundation and contributors.
+ * SPDX-License-Identifier: MIT
+ */
 import * as utils from '../utils';
 
 describe('Test hexStrToBytes()', () => {

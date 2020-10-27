@@ -1,4 +1,11 @@
 /**
+ * General utilities.
+ *
+ * (c) 2020 Micro:bit Educational Foundation and the project contributors.
+ * SPDX-License-Identifier: MIT
+ */
+
+/**
  * Convert from a string with a hexadecimal number into a Uint8Array byte array.
  *
  * @export

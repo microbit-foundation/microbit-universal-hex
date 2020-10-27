@@ -1,3 +1,9 @@
+/**
+ * Generate and process Intel Hex records.
+ *
+ * (c) 2020 Micro:bit Educational Foundation and contributors.
+ * SPDX-License-Identifier: MIT
+ */
 import * as utils from './utils';
 
 /** Values for the Record Type field, including Universal Hex custom types. */

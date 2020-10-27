@@ -1,4 +1,4 @@
-# micro:bit Universal Hex
+# micro:bit Universal Hex TypeScript Library
 
 [![CircleCI](https://circleci.com/gh/microbit-foundation/microbit-universal-hex.svg?style=svg)](https://circleci.com/gh/microbit-foundation/microbit-universal-hex)
 
