@@ -17,7 +17,6 @@ const config = {
       statements: 80,
     },
   },
-  setupFiles: ['<rootDir>/config/setup-tests.js'],
   watchPlugins: [
     'jest-watch-typeahead/filename',
     'jest-watch-typeahead/testname',
