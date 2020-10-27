@@ -1,0 +1,19 @@
+remote_theme: pmarsceill/just-the-docs
+
+# Markdown settings: https://jekyllrb.com/docs/configuration/markdown/
+kramdown:
+  # GitHub flavoured markdown
+  input: GFM
+  # Interprets line breaks literally
+  hard_wrap: false
+
+# Just The Docs settings
+
+# Enable or disable the site search
+search_enabled: true
+# Aux links for the upper right navigation
+aux_links:
+  'View on GitHub':
+    - 'https://github.com/microbit-foundation/microbit-universal-hex/'
+# Color scheme currently only supports "dark" or nil (default)
+color_scheme: 'light'

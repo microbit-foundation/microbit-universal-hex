@@ -1,3 +1,5 @@
+# Contributing
+
 Thanks for looking here! We'd love your help. The micro:bit project is only
 possible through contributions of companies and individuals around the world.
 
