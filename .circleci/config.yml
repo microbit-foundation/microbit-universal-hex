@@ -26,9 +26,33 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
+  deploy:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run:
+          name: Configure registry auth
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/repo/.npmrc
+      - run:
+          name: Publish package
+          # For now we only publish on tags here and assume the version number is already correct.
+          # If we change this then we need to automate updating the version number.
+          command: npm publish $(if [ -z "$CIRCLE_TAG" ]; then echo "--tag next"; fi)
 
 workflows:
   version: 2
   test-deploy:
     jobs:
-      - test
+      - test:
+          filters:
+            tags:
+              only: /^v.*/
+      - deploy:
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
