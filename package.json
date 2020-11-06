@@ -1,5 +1,5 @@
 {
-  "name": "@microbit-foundation/microbit-universal-hex",
+  "name": "@microbit/microbit-universal-hex",
   "version": "0.1.0",
   "description": "Create micro:bit Universal Hexes.",
   "keywords": [
