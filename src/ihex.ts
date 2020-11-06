@@ -361,6 +361,28 @@ function convertRecordTo(iHexRecord: string, recordType: RecordType): string {
 }
 
 /**
+ * Converts and Extended Segment Linear Address record to an Extended Linear
+ * Address record.
+ *
+ * @throws {Error} When the record does not contain exactly 2 bytes.
+ * @throws {Error} When the Segmented Address is not a multiple of 0x1000.
+ *
+ * @param iHexRecord Intel hex record line without line terminator.
+ */
+function convertExtSegToLinAddressRecord(iHexRecord: string): string {
+  const segmentAddress = getRecordData(iHexRecord);
+  if (
+    segmentAddress.length !== 2 ||
+    segmentAddress[0] & 0xf || // Only process multiples of 0x1000
+    segmentAddress[1] !== 0
+  ) {
+    throw new Error(`Invalid Extended Segment Address record ${iHexRecord}`);
+  }
+  const startAddress = segmentAddress[0] << 12;
+  return extLinAddressRecord(startAddress);
+}
+
+/**
  * Separates an Intel Hex file (string) into an array of Record strings.
  *
  * @param iHexStr Intel Hex file as a string.
@@ -386,8 +408,8 @@ function iHexToRecordStrs(iHexStr: string): string[] {
  * This is useful to identify the expected max size of the data records for an
  * Intel Hex, and then be able to generate new custom records of the same size.
  *
- * @param iHexRecords Array of Intel Hex Records
- * @returns Number of data bytes th
+ * @param iHexRecords Array of Intel Hex Records.
+ * @returns Number of data bytes in a full record.
  */
 function findDataFieldLength(iHexRecords: string[]): number {
   let maxDataBytes = 16;
@@ -423,6 +445,7 @@ export {
   blockEndRecord,
   paddedDataRecord,
   convertRecordTo,
+  convertExtSegToLinAddressRecord,
   iHexToRecordStrs,
   findDataFieldLength,
 };

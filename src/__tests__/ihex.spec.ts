@@ -1,3 +1,9 @@
+/**
+ * Tests for ihex module.
+ *
+ * (c) 2020 Micro:bit Educational Foundation and contributors.
+ * SPDX-License-Identifier: MIT
+ */
 import * as ihex from '../ihex';
 
 describe('Test createRecord() for standard records', () => {
@@ -394,6 +400,43 @@ describe('Test convertRecordTo()', () => {
         ihex.RecordType.CustomData
       )
     ).toEqual(':10B0400DD90B08BD40420F0070B5044616460D469B');
+  });
+});
+
+describe('Test convertExtSegToLinAddressRecord()', () => {
+  it('Converts valid Extended Segment Address Records into Linear', () => {
+    expect(ihex.convertExtSegToLinAddressRecord(':020000020000FC')).toEqual(
+      ':020000040000FA'
+    );
+    expect(ihex.convertExtSegToLinAddressRecord(':020000021000EC')).toEqual(
+      ':020000040001F9'
+    );
+    expect(ihex.convertExtSegToLinAddressRecord(':020000022000DC')).toEqual(
+      ':020000040002F8'
+    );
+    expect(ihex.convertExtSegToLinAddressRecord(':020000023000CC')).toEqual(
+      ':020000040003F7'
+    );
+    expect(ihex.convertExtSegToLinAddressRecord(':020000024000BC')).toEqual(
+      ':020000040004F6'
+    );
+    expect(ihex.convertExtSegToLinAddressRecord(':0200000270008C')).toEqual(
+      ':020000040007F3'
+    );
+  });
+
+  it('Throws error with an invalid Extended Segment Address', () => {
+    expect(() => {
+      ihex.convertExtSegToLinAddressRecord(':0200000270018C');
+    }).toThrow('Invalid Extended Segment Address record');
+
+    expect(() => {
+      ihex.convertExtSegToLinAddressRecord(':0300000271008C');
+    }).toThrow('Invalid Extended Segment Address record');
+
+    expect(() => {
+      ihex.convertExtSegToLinAddressRecord(':030000027000FF8C');
+    }).toThrow('Invalid Extended Segment Address record');
   });
 });
 
