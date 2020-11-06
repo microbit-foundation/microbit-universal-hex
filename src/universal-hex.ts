@@ -16,22 +16,20 @@ interface IndividualHex {
 }
 
 /**
- * Converts an Intel Hex file string into a Universal Hex ready hex string using custom
- * records and 512 byte blocks.
- *
- * Block format:
- *  - Extended linear address record
+ * Converts an Intel Hex file string into a Universal Hex ready hex string using
+ * custom records and 512 byte blocks.
  *
  * More information on the format:
- *  https://github.com/microbit-foundation/universal-hex
+ *   https://github.com/microbit-foundation/universal-hex
  *
  * @throws {Error} When the Board ID is not between 0 and 2^16.
+ * @throws {Error} When there is an EoF record not at the end of the file.
  *
  * @param iHexStr - Intel Hex string to convert into the custom format with 512
  *    byte blocks and the customer records.
  * @returns New Intel Hex string with the custom format.
  */
-function iHexToCustomFormat(iHexStr: string, boardId: number): string {
+function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
   // Hex files for v1.3 and v1.5 continue using the normal Data Record Type
   const replaceDataRecord = !V1_BOARD_IDS.includes(boardId);
 
@@ -96,7 +94,7 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
       blockLines.push(ihex.blockEndRecord(0));
       blockLines.push(ihex.endOfFileRecord());
     } else {
-      // We might need an additional padding records
+      // We might need additional padding records
       // const charsLeft = BLOCK_SIZE - blockLen;
       while (BLOCK_SIZE - blockLen > recordPaddingCapacity * 2) {
         const record = ihex.paddedDataRecord(
@@ -108,16 +106,119 @@ function iHexToCustomFormat(iHexStr: string, boardId: number): string {
         blockLines.push(record);
         blockLen += record.length + 1;
       }
-      // TODO: Can we end up with a block needing an odd number of padded chars?
       blockLines.push(ihex.blockEndRecord((BLOCK_SIZE - blockLen) / 2));
     }
   }
+  blockLines.push(''); // Ensure there is a blank new line at the end
 
-  return blockLines.length ? blockLines.join('\n') + '\n' : '';
+  return blockLines.join('\n');
 }
 
-function createUniversalHex(hexes: IndividualHex[]): string {
+/**
+ * Converts an Intel Hex file string into a Universal Hex ready hex string using
+ * custom records and sections aligned with 512-byte boundaries.
+ *
+ * More information on the format:
+ *   https://github.com/microbit-foundation/universal-hex
+ *
+ * @throws {Error} When the Board ID is not between 0 and 2^16.
+ * @throws {Error} When there is an EoF record not at the end of the file.
+ *
+ * @param iHexStr - Intel Hex string to convert into the custom format with 512
+ *    byte blocks and the customer records.
+ * @returns New Intel Hex string with the custom format.
+ */
+function iHexToCustomFormatSection(iHexStr: string, boardId: number): string {
+  const sectionLines: string[] = [];
+  let sectionLen = 0;
+  let ih = 0;
+
+  const addRecordLength = (record: string) => {
+    sectionLen += record.length + 1; // Extra character counted for '\n'
+  };
+  const addRecord = (record: string) => {
+    sectionLines.push(record);
+    addRecordLength(record);
+  };
+
+  const hexRecords = ihex.iHexToRecordStrs(iHexStr);
+  if (!hexRecords.length) return '';
+
+  // If first record is not an Extended Segmented/Linear Address we start at 0x0
+  const iHexFirstRecordType = ihex.getRecordType(hexRecords[0]);
+  if (iHexFirstRecordType === ihex.RecordType.ExtendedLinearAddress) {
+    addRecord(hexRecords[0]);
+    ih++;
+  } else if (iHexFirstRecordType === ihex.RecordType.ExtendedSegmentAddress) {
+    addRecord(ihex.convertExtSegToLinAddressRecord(hexRecords[0]));
+    ih++;
+  } else {
+    addRecord(ihex.extLinAddressRecord(0));
+  }
+
+  // Add the Block Start record to the beginning of the segment
+  addRecord(ihex.blockStartRecord(boardId));
+
+  // Iterate through the rest of the records and add them
+  const replaceDataRecord = !V1_BOARD_IDS.includes(boardId);
+  let endOfFile = false;
+  while (ih < hexRecords.length) {
+    const record = hexRecords[ih++];
+    const recordType = ihex.getRecordType(record);
+    if (recordType === ihex.RecordType.Data) {
+      addRecord(
+        replaceDataRecord
+          ? ihex.convertRecordTo(record, ihex.RecordType.CustomData)
+          : record
+      );
+    } else if (recordType === ihex.RecordType.ExtendedSegmentAddress) {
+      addRecord(ihex.convertExtSegToLinAddressRecord(record));
+    } else if (recordType === ihex.RecordType.ExtendedLinearAddress) {
+      addRecord(record);
+    } else if (recordType === ihex.RecordType.EndOfFile) {
+      endOfFile = true;
+      break;
+    }
+  }
+  if (ih !== hexRecords.length) {
+    throw new Error(`EoF record found at line ${ih} of ${hexRecords.length}`);
+  }
+
+  // Add to the section size calculation the minimum length for the Block End
+  // record that will be placed at the end (no padding included yet)
+  addRecordLength(ihex.blockEndRecord(0));
+  // Calculate padding required to end in a 512-byte boundary
+  const recordNoDataLenChars = ihex.paddedDataRecord(0).length + 1;
+  const recordDataMaxBytes = ihex.findDataFieldLength(hexRecords);
+  const paddingCapacityChars = recordDataMaxBytes * 2;
+  let charsNeeded = (BLOCK_SIZE - (sectionLen % BLOCK_SIZE)) % BLOCK_SIZE;
+  while (charsNeeded > paddingCapacityChars) {
+    const byteLen = (charsNeeded - recordNoDataLenChars) >> 1; // Integer div 2
+    const record = ihex.paddedDataRecord(Math.min(byteLen, recordDataMaxBytes));
+    addRecord(record);
+    charsNeeded = (BLOCK_SIZE - (sectionLen % BLOCK_SIZE)) % BLOCK_SIZE;
+  }
+  sectionLines.push(ihex.blockEndRecord(charsNeeded >> 1));
+  if (endOfFile) sectionLines.push(ihex.endOfFileRecord());
+  sectionLines.push(''); // Ensure there is a blank new line at the end
+
+  return sectionLines.join('\n');
+}
+
+/**
+ * Creates a Universal Hex from an collection of Intel Hex strings and their
+ * board IDs.
+ *
+ * @param hexes An array of objects containing an Intel Hex strings and the
+ *     board ID associated with it.
+ * @param blocks Indicate if the Universal Hex should be blocks instead of
+ *     sections.
+ */
+function createUniversalHex(hexes: IndividualHex[], blocks = false): string {
   if (!hexes.length) return '';
+  const iHexToCustomFormat = blocks
+    ? iHexToCustomFormatBlocks
+    : iHexToCustomFormatSection;
 
   const eofRecord = ihex.endOfFileRecord();
   const eofNlRecord = eofRecord + '\n';
@@ -125,20 +226,19 @@ function createUniversalHex(hexes: IndividualHex[]): string {
   // We remove the EoF record from all but the last hex file so that the last
   // blocks are padded and there is single EoF record
   for (let i = 0; i < hexes.length - 1; i++) {
-    let customHex = hexes[i].hex;
+    let customHex = iHexToCustomFormat(hexes[i].hex, hexes[i].boardId);
     if (customHex.endsWith(eofNlRecord)) {
       customHex = customHex.slice(0, customHex.length - eofNlRecord.length);
     } else if (customHex.endsWith(eofRecord)) {
       customHex = customHex.slice(0, customHex.length - eofRecord.length);
     } else {
       throw Error(
-        `Could not fine the End Of File record on hex with Board ID ${hexes[i].boardId}`
+        `Could not find the End Of File record on hex with Board ID ${hexes[i].boardId}`
       );
     }
-    customHex = iHexToCustomFormat(customHex, hexes[i].boardId);
     customHexes.push(customHex);
   }
-  // Process the last hex file with a guarantee EoF record
+  // Process the last hex file with a guaranteed EoF record
   const lastCustomHex = iHexToCustomFormat(
     hexes[hexes.length - 1].hex,
     hexes[hexes.length - 1].boardId
@@ -267,7 +367,8 @@ function separateUniversalHex(universalHexStr: string): IndividualHex[] {
 }
 
 export {
-  iHexToCustomFormat,
+  iHexToCustomFormatBlocks,
+  iHexToCustomFormatSection,
   createUniversalHex,
   isUniversalHex,
   separateUniversalHex,
