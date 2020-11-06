@@ -2437,6 +2437,13 @@
 	});
 
 	/**
+	 * General utilities.
+	 *
+	 * (c) 2020 Micro:bit Educational Foundation and the project contributors.
+	 * SPDX-License-Identifier: MIT
+	 */
+
+	/**
 	 * Convert from a string with a hexadecimal number into a Uint8Array byte array.
 	 *
 	 * @export
@@ -2529,11 +2536,11 @@
 	})(RecordType || (RecordType = {}));
 	/**
 	 * The maximum data bytes per record is 0xFF, 16 and 32 bytes are the two most
-	 * common lengths, but to start we'll only support 16 bytes
+	 * common lengths, but DAPLink doesn't support more than 32 bytes.
 	 */
 
 
-	var RECORD_DATA_MAX_BYTES = 16;
+	var RECORD_DATA_MAX_BYTES = 32;
 	/**
 	 * Constants for the record character lengths.
 	 */
@@ -2551,7 +2558,7 @@
 	var DATA_STR_LEN_MIN = 0;
 	var CHECKSUM_STR_LEN = 2;
 	var MIN_RECORD_STR_LEN = START_CODE_STR_LEN + BYTE_COUNT_STR_LEN + ADDRESS_STR_LEN + RECORD_TYPE_STR_LEN + DATA_STR_LEN_MIN + CHECKSUM_STR_LEN;
-	var MAX_RECORD_STR_LEN = START_CODE_STR_LEN + BYTE_COUNT_STR_LEN + ADDRESS_STR_LEN + RECORD_TYPE_STR_LEN + RECORD_DATA_MAX_BYTES * 2 + CHECKSUM_STR_LEN;
+	var MAX_RECORD_STR_LEN = MIN_RECORD_STR_LEN - DATA_STR_LEN_MIN + RECORD_DATA_MAX_BYTES * 2;
 	/**
 	 * Checks if a given number is a valid Record type.
 	 *
@@ -2616,7 +2623,7 @@
 	  return "" + START_CODE_STR + recordContentStr + checksumStr;
 	}
 	/**
-	 * Check if the an Intel Hex record conforms to the following rules:
+	 * Check if an Intel Hex record conforms to the following rules:
 	 *  - Correct length of characters
 	 *  - Starts with a colon
 	 *
@@ -2741,7 +2748,7 @@
 
 	function extLinAddressRecord(address) {
 	  if (address < 0 || address > 0xffffffff) {
-	    throw new Error("Address '" + address + "' for Extended Linear Address record is in range.");
+	    throw new Error("Address '" + address + "' for Extended Linear Address record is out of range.");
 	  }
 
 	  return createRecord(0, RecordType.ExtendedLinearAddress, new Uint8Array([address >> 24 & 0xff, address >> 16 & 0xff]));
@@ -2791,17 +2798,6 @@
 	  }
 	}
 	/**
-	 * The Block end record can add bytes to the data field to be generate 512 byte
-	 * blocks. This function exposes how many bytes the record can fit.
-	 *
-	 * @returns Number of padding bytes that fit inside a Block End (custom) Record.
-	 */
-
-
-	function recordPaddingCapacity() {
-	  return RECORD_DATA_MAX_BYTES;
-	}
-	/**
 	 * Create a Padded Data (custom) Intel Hex Record.
 	 * This record is used to add padding data, to be ignored by DAPLink, to be able
 	 * to create blocks of 512-bytes.
@@ -2840,6 +2836,28 @@
 	  return "" + START_CODE_STR + recordContentStr + checksumStr;
 	}
 	/**
+	 * Converts and Extended Segment Linear Address record to an Extended Linear
+	 * Address record.
+	 *
+	 * @throws {Error} When the record does not contain exactly 2 bytes.
+	 * @throws {Error} When the Segmented Address is not a multiple of 0x1000.
+	 *
+	 * @param iHexRecord Intel hex record line without line terminator.
+	 */
+
+
+	function convertExtSegToLinAddressRecord(iHexRecord) {
+	  var segmentAddress = getRecordData(iHexRecord);
+
+	  if (segmentAddress.length !== 2 || segmentAddress[0] & 0xf || // Only process multiples of 0x1000
+	  segmentAddress[1] !== 0) {
+	    throw new Error("Invalid Extended Segment Address record " + iHexRecord);
+	  }
+
+	  var startAddress = segmentAddress[0] << 12;
+	  return extLinAddressRecord(startAddress);
+	}
+	/**
 	 * Separates an Intel Hex file (string) into an array of Record strings.
 	 *
 	 * @param iHexStr Intel Hex file as a string.
@@ -2855,27 +2873,66 @@
 
 	  return output.filter(Boolean);
 	}
+	/**
+	 * Iterates through the beginning of an array of Intel Hex records to find the
+	 * longest record data field length.
+	 *
+	 * Once it finds 12 records at the maximum size found so far (starts at 16
+	 * bytes) it will stop iterating.
+	 *
+	 * This is useful to identify the expected max size of the data records for an
+	 * Intel Hex, and then be able to generate new custom records of the same size.
+	 *
+	 * @param iHexRecords Array of Intel Hex Records.
+	 * @returns Number of data bytes in a full record.
+	 */
+
+
+	function findDataFieldLength(iHexRecords) {
+	  var maxDataBytes = 16;
+	  var maxDataBytesCount = 0;
+
+	  for (var _i = 0, iHexRecords_1 = iHexRecords; _i < iHexRecords_1.length; _i++) {
+	    var record = iHexRecords_1[_i];
+	    var dataBytesLength = (record.length - MIN_RECORD_STR_LEN) / 2;
+
+	    if (dataBytesLength > maxDataBytes) {
+	      maxDataBytes = dataBytesLength;
+	      maxDataBytesCount = 0;
+	    } else if (dataBytesLength === maxDataBytes) {
+	      maxDataBytesCount++;
+	    }
+
+	    if (maxDataBytesCount > 12) {
+	      break;
+	    }
+	  }
+
+	  if (maxDataBytes > RECORD_DATA_MAX_BYTES) {
+	    throw new Error("Intel Hex record data size is too large: " + maxDataBytes);
+	  }
+
+	  return maxDataBytes;
+	}
 
 	var V1_BOARD_IDS = [0x9900, 0x9901];
 	var BLOCK_SIZE = 512;
 	/**
-	 * Converts a hex file string into a Universal Hex ready hex string using custom
-	 * records and 512 byte blocks.
-	 *
-	 * Block format:
-	 *  - Extended linear address record
+	 * Converts an Intel Hex file string into a Universal Hex ready hex string using
+	 * custom records and 512 byte blocks.
 	 *
 	 * More information on the format:
-	 *  https://github.com/microbit-foundation/fat-binaries
+	 *   https://github.com/microbit-foundation/universal-hex
 	 *
 	 * @throws {Error} When the Board ID is not between 0 and 2^16.
+	 * @throws {Error} When there is an EoF record not at the end of the file.
 	 *
 	 * @param iHexStr - Intel Hex string to convert into the custom format with 512
 	 *    byte blocks and the customer records.
 	 * @returns New Intel Hex string with the custom format.
 	 */
 
-	function iHexToCustomFormat(iHexStr, boardId) {
+	function iHexToCustomFormatBlocks(iHexStr, boardId) {
 	  // Hex files for v1.3 and v1.5 continue using the normal Data Record Type
 	  var replaceDataRecord = !V1_BOARD_IDS.includes(boardId); // Generate some constant records
 
@@ -2885,9 +2942,9 @@
 	  var extAddrRecordLen = currentExtAddr.length;
 	  var startRecordLen = startRecord.length;
 	  var endRecordBaseLen = blockEndRecord(0).length;
-	  var recordPaddingCapacity$1 = recordPaddingCapacity();
 	  var padRecordBaseLen = paddedDataRecord(0).length;
-	  var hexRecords = iHexToRecordStrs(iHexStr); // Each loop iteration corresponds to a 512-bytes block
+	  var hexRecords = iHexToRecordStrs(iHexStr);
+	  var recordPaddingCapacity = findDataFieldLength(hexRecords); // Each loop iteration corresponds to a 512-bytes block
 
 	  var ih = 0;
 	  var blockLines = [];
@@ -2899,6 +2956,9 @@
 
 	    if (firstRecordType === RecordType.ExtendedLinearAddress) {
 	      currentExtAddr = hexRecords[ih];
+	      ih++;
+	    } else if (firstRecordType === RecordType.ExtendedSegmentAddress) {
+	      currentExtAddr = convertExtSegToLinAddressRecord(hexRecords[ih]);
 	      ih++;
 	    }
 
@@ -2917,6 +2977,8 @@
 	        record = convertRecordTo(record, RecordType.CustomData);
 	      } else if (recordType === RecordType.ExtendedLinearAddress) {
 	        currentExtAddr = record;
+	      } else if (recordType === RecordType.ExtendedSegmentAddress) {
+	        currentExtAddr = convertExtSegToLinAddressRecord(record);
 	      } else if (recordType === RecordType.EndOfFile) {
 	        endOfFile = true;
 	        break;
@@ -2937,43 +2999,152 @@
 	      blockLines.push(blockEndRecord(0));
 	      blockLines.push(endOfFileRecord());
 	    } else {
-	      // We might need an additional padding records
+	      // We might need additional padding records
 	      // const charsLeft = BLOCK_SIZE - blockLen;
-	      while (BLOCK_SIZE - blockLen > recordPaddingCapacity$1 * 2) {
-	        var record = paddedDataRecord(Math.min((BLOCK_SIZE - blockLen - (padRecordBaseLen + 1)) / 2, recordPaddingCapacity$1));
+	      while (BLOCK_SIZE - blockLen > recordPaddingCapacity * 2) {
+	        var record = paddedDataRecord(Math.min((BLOCK_SIZE - blockLen - (padRecordBaseLen + 1)) / 2, recordPaddingCapacity));
 	        blockLines.push(record);
 	        blockLen += record.length + 1;
-	      } // TODO: Can we end up with a block needing an odd number of padded chars?
-
+	      }
 
 	      blockLines.push(blockEndRecord((BLOCK_SIZE - blockLen) / 2));
 	    }
 	  }
 
-	  return blockLines.length ? blockLines.join('\n') + '\n' : '';
-	}
+	  blockLines.push(''); // Ensure there is a blank new line at the end
 
-	function createUniversalHex(hexes) {
+	  return blockLines.join('\n');
+	}
+	/**
+	 * Converts an Intel Hex file string into a Universal Hex ready hex string using
+	 * custom records and sections aligned with 512-byte boundaries.
+	 *
+	 * More information on the format:
+	 *   https://github.com/microbit-foundation/universal-hex
+	 *
+	 * @throws {Error} When the Board ID is not between 0 and 2^16.
+	 * @throws {Error} When there is an EoF record not at the end of the file.
+	 *
+	 * @param iHexStr - Intel Hex string to convert into the custom format with 512
+	 *    byte blocks and the customer records.
+	 * @returns New Intel Hex string with the custom format.
+	 */
+
+
+	function iHexToCustomFormatSection(iHexStr, boardId) {
+	  var sectionLines = [];
+	  var sectionLen = 0;
+	  var ih = 0;
+
+	  var addRecordLength = function addRecordLength(record) {
+	    sectionLen += record.length + 1; // Extra character counted for '\n'
+	  };
+
+	  var addRecord = function addRecord(record) {
+	    sectionLines.push(record);
+	    addRecordLength(record);
+	  };
+
+	  var hexRecords = iHexToRecordStrs(iHexStr);
+	  if (!hexRecords.length) return ''; // If first record is not an Extended Segmented/Linear Address we start at 0x0
+
+	  var iHexFirstRecordType = getRecordType(hexRecords[0]);
+
+	  if (iHexFirstRecordType === RecordType.ExtendedLinearAddress) {
+	    addRecord(hexRecords[0]);
+	    ih++;
+	  } else if (iHexFirstRecordType === RecordType.ExtendedSegmentAddress) {
+	    addRecord(convertExtSegToLinAddressRecord(hexRecords[0]));
+	    ih++;
+	  } else {
+	    addRecord(extLinAddressRecord(0));
+	  } // Add the Block Start record to the beginning of the segment
+
+
+	  addRecord(blockStartRecord(boardId)); // Iterate through the rest of the records and add them
+
+	  var replaceDataRecord = !V1_BOARD_IDS.includes(boardId);
+	  var endOfFile = false;
+
+	  while (ih < hexRecords.length) {
+	    var record = hexRecords[ih++];
+	    var recordType = getRecordType(record);
+
+	    if (recordType === RecordType.Data) {
+	      addRecord(replaceDataRecord ? convertRecordTo(record, RecordType.CustomData) : record);
+	    } else if (recordType === RecordType.ExtendedSegmentAddress) {
+	      addRecord(convertExtSegToLinAddressRecord(record));
+	    } else if (recordType === RecordType.ExtendedLinearAddress) {
+	      addRecord(record);
+	    } else if (recordType === RecordType.EndOfFile) {
+	      endOfFile = true;
+	      break;
+	    }
+	  }
+
+	  if (ih !== hexRecords.length) {
+	    throw new Error("EoF record found at line " + ih + " of " + hexRecords.length);
+	  } // Add to the section size calculation the minimum length for the Block End
+	  // record that will be placed at the end (no padding included yet)
+
+
+	  addRecordLength(blockEndRecord(0)); // Calculate padding required to end in a 512-byte boundary
+
+	  var recordNoDataLenChars = paddedDataRecord(0).length + 1;
+	  var recordDataMaxBytes = findDataFieldLength(hexRecords);
+	  var paddingCapacityChars = recordDataMaxBytes * 2;
+	  var charsNeeded = (BLOCK_SIZE - sectionLen % BLOCK_SIZE) % BLOCK_SIZE;
+
+	  while (charsNeeded > paddingCapacityChars) {
+	    var byteLen = charsNeeded - recordNoDataLenChars >> 1; // Integer div 2
+
+	    var record = paddedDataRecord(Math.min(byteLen, recordDataMaxBytes));
+	    addRecord(record);
+	    charsNeeded = (BLOCK_SIZE - sectionLen % BLOCK_SIZE) % BLOCK_SIZE;
+	  }
+
+	  sectionLines.push(blockEndRecord(charsNeeded >> 1));
+	  if (endOfFile) sectionLines.push(endOfFileRecord());
+	  sectionLines.push(''); // Ensure there is a blank new line at the end
+
+	  return sectionLines.join('\n');
+	}
+	/**
+	 * Creates a Universal Hex from an collection of Intel Hex strings and their
+	 * board IDs.
+	 *
+	 * @param hexes An array of objects containing an Intel Hex strings and the
+	 *     board ID associated with it.
+	 * @param blocks Indicate if the Universal Hex should be blocks instead of
+	 *     sections.
+	 */
+
+
+	function createUniversalHex(hexes, blocks) {
+	  if (blocks === void 0) {
+	    blocks = false;
+	  }
+
 	  if (!hexes.length) return '';
+	  var iHexToCustomFormat = blocks ? iHexToCustomFormatBlocks : iHexToCustomFormatSection;
 	  var eofRecord = endOfFileRecord();
 	  var eofNlRecord = eofRecord + '\n';
 	  var customHexes = []; // We remove the EoF record from all but the last hex file so that the last
 	  // blocks are padded and there is single EoF record
 
 	  for (var i = 0; i < hexes.length - 1; i++) {
-	    var customHex = hexes[i].hex;
+	    var customHex = iHexToCustomFormat(hexes[i].hex, hexes[i].boardId);
 
 	    if (customHex.endsWith(eofNlRecord)) {
 	      customHex = customHex.slice(0, customHex.length - eofNlRecord.length);
 	    } else if (customHex.endsWith(eofRecord)) {
 	      customHex = customHex.slice(0, customHex.length - eofRecord.length);
 	    } else {
-	      throw Error("Could not fine the End Of File record on hex with Board ID " + hexes[i].boardId);
+	      throw Error("Could not find the End Of File record on hex with Board ID " + hexes[i].boardId);
 	    }
 
-	    customHex = iHexToCustomFormat(customHex, hexes[i].boardId);
 	    customHexes.push(customHex);
-	  } // Process the last hex file with a guarantee EoF record
+	  } // Process the last hex file with a guaranteed EoF record
 
 
 	  var lastCustomHex = iHexToCustomFormat(hexes[hexes.length - 1].hex, hexes[hexes.length - 1].boardId);
@@ -2986,7 +3157,7 @@
 	  return customHexes.join('');
 	}
 	/**
-	 * Checks if the provided hex string is a fat binary.
+	 * Checks if the provided hex string is a universal hex.
 	 *
 	 * Very simple test only checking for the opening Extended Linear Address and
 	 * Block Start records.
@@ -3001,22 +3172,22 @@
 
 	function isUniversalHex(hexStr) {
 	  // Check the beginning of the Extended Linear Address record
-	  var startOfElaRecord = ':02000004';
+	  var elaRecordBeginning = ':02000004';
 
-	  if (hexStr.slice(0, startOfElaRecord.length) !== startOfElaRecord) {
+	  if (hexStr.slice(0, elaRecordBeginning.length) !== elaRecordBeginning) {
 	    return false;
 	  } // Find the index for the next record, as we have unknown line endings
 
 
-	  var i = startOfElaRecord.length;
+	  var i = elaRecordBeginning.length;
 
-	  while (hexStr[++i] !== ':' && i < 50) {
+	  while (hexStr[++i] !== ':' && i < MAX_RECORD_STR_LEN + 3) {
 	  } // Check the beginning of the Block Start record
 
 
-	  var startOfBsRecord = ':0400000A';
+	  var blockStartBeginning = ':0400000A';
 
-	  if (hexStr.slice(i, i + startOfBsRecord.length) !== startOfBsRecord) {
+	  if (hexStr.slice(i, i + blockStartBeginning.length) !== blockStartBeginning) {
 	    return false;
 	  }
 
@@ -3100,7 +3271,8 @@
 	}
 
 	exports.createUniversalHex = createUniversalHex;
-	exports.iHexToCustomFormat = iHexToCustomFormat;
+	exports.iHexToCustomFormatBlocks = iHexToCustomFormatBlocks;
+	exports.iHexToCustomFormatSection = iHexToCustomFormatSection;
 	exports.isUniversalHex = isUniversalHex;
 	exports.separateUniversalHex = separateUniversalHex;
 
