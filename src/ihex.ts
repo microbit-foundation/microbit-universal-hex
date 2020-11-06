@@ -63,12 +63,7 @@ const MIN_RECORD_STR_LEN =
   DATA_STR_LEN_MIN +
   CHECKSUM_STR_LEN;
 const MAX_RECORD_STR_LEN =
-  START_CODE_STR_LEN +
-  BYTE_COUNT_STR_LEN +
-  ADDRESS_STR_LEN +
-  RECORD_TYPE_STR_LEN +
-  RECORD_DATA_MAX_BYTES * 2 +
-  CHECKSUM_STR_LEN;
+  MIN_RECORD_STR_LEN - DATA_STR_LEN_MIN + RECORD_DATA_MAX_BYTES * 2;
 
 /**
  * Checks if a given number is a valid Record type.
@@ -142,7 +137,7 @@ function createRecord(
 }
 
 /**
- * Check if the an Intel Hex record conforms to the following rules:
+ * Check if an Intel Hex record conforms to the following rules:
  *  - Correct length of characters
  *  - Starts with a colon
  *
@@ -271,7 +266,7 @@ function endOfFileRecord(): string {
 function extLinAddressRecord(address: number): string {
   if (address < 0 || address > 0xffffffff) {
     throw new Error(
-      `Address '${address}' for Extended Linear Address record is in range.`
+      `Address '${address}' for Extended Linear Address record is out of range.`
     );
   }
   return createRecord(

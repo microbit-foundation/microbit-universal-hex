@@ -8,31 +8,29 @@ import * as ihex from '../ihex';
 
 describe('Test createRecord() for standard records', () => {
   it('Creates standard data records', () => {
+    let a = [0x64, 0x27, 0x00, 0x20, 0x03, 0x4b, 0x19, 0x60];
+    let b = [0x43, 0x68, 0x03, 0x49, 0x9b, 0x00, 0x5a, 0x50];
     // Examples taken from a random micro:bit hex file
     expect(
       ihex.createRecord(
         0x4290,
         ihex.RecordType.Data,
-        new Uint8Array([
-          0x64,
-          0x27,
-          0x00,
-          0x20,
-          0x03,
-          0x4b,
-          0x19,
-          0x60,
-          0x43,
-          0x68,
-          0x03,
-          0x49,
-          0x9b,
-          0x00,
-          0x5a,
-          0x50,
-        ])
+        new Uint8Array(a.concat(b))
       )
     ).toEqual(':1042900064270020034B1960436803499B005A5070');
+
+    a = [0x12, 0xf0, 0xd0, 0xfb, 0x07, 0xee, 0x90, 0x0a, 0xf5, 0xee, 0xc0];
+    b = [0x7a, 0xf1, 0xee, 0x10, 0xfa, 0x44, 0xbf, 0x9f, 0xed, 0x08, 0x7a];
+    const c = [0x77, 0xee, 0x87, 0x7a, 0xfd, 0xee, 0xe7, 0x7a, 0x17, 0xee];
+    expect(
+      ihex.createRecord(
+        0x07e0,
+        ihex.RecordType.Data,
+        new Uint8Array(a.concat(b).concat(c))
+      )
+    ).toEqual(
+      ':2007E00012F0D0FB07EE900AF5EEC07AF1EE10FA44BF9FED087A77EE877AFDEEE77A17EECF'
+    );
 
     expect(
       ihex.createRecord(
@@ -51,7 +49,7 @@ describe('Test createRecord() for standard records', () => {
     ).toEqual(':08E7D4000C1AFF7F0100000098');
   });
 
-  it('Creates a custom End Of File record', () => {
+  it('Creates an End Of File record', () => {
     expect(
       ihex.createRecord(0, ihex.RecordType.EndOfFile, new Uint8Array([]))
     ).toEqual(':00000001FF');
@@ -73,7 +71,7 @@ describe('Test createRecord() for standard records', () => {
 
     expect(() => {
       ihex.createRecord(0, ihex.RecordType.Data, new Uint8Array(data));
-    }).toThrow();
+    }).toThrow('data has too many bytes');
   });
 
   it('Throws error when the address is too large', () => {
@@ -180,10 +178,18 @@ describe('Test getRecordData()', () => {
     );
   });
 
-  it('Get the data from a full Padding record', () => {
+  it('Get the data from a half Padding record', () => {
     expect(
       ihex.getRecordData(':1080B00DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3')
     ).toEqual(new Uint8Array(new Array(16).fill(0xff)));
+  });
+
+  it('Get the data from a full Padding record', () => {
+    expect(
+      ihex.getRecordData(
+        ':1080B00DFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC3'
+      )
+    ).toEqual(new Uint8Array(new Array(32).fill(0xff)));
   });
 
   it('Empty array when record is too short', () => {
@@ -198,36 +204,41 @@ describe('Test getRecordData()', () => {
 });
 
 describe('Test parseRecord() for standard records', () => {
-  it('Parses data records of different lengths', () => {
-    let result = ihex.parseRecord(
+  it('Parses data records of different lengths (32)', () => {
+    const result = ihex.parseRecord(
+      ':201C400010F0D2FF3246CDE900013B463046394610F0EEFC02460B46DDE9000110F09AFE2C'
+    );
+
+    expect(result.byteCount).toEqual(0x20);
+    expect(result.address).toEqual(0x1c40);
+    expect(result.recordType).toEqual(0x00);
+    const a = [0x10, 0xf0, 0xd2, 0xff, 0x32, 0x46, 0xcd, 0xe9, 0x00, 0x01];
+    const b = [0x3b, 0x46, 0x30, 0x46, 0x39, 0x46, 0x10, 0xf0, 0xee, 0xfc];
+    const c = [0x02, 0x46, 0x0b, 0x46, 0xdd, 0xe9, 0x00, 0x01, 0x10, 0xf0];
+    const d = [0x9a, 0xfe];
+    expect(result.data).toEqual(
+      new Uint8Array(a.concat(b).concat(c).concat(d))
+    );
+    expect(result.checksum).toEqual(0x2c);
+  });
+
+  it('Parses data records of different lengths (16)', () => {
+    const result = ihex.parseRecord(
       ':10FFF0009B6D9847A06810F039FF0621A06810F0AB'
     );
+
     expect(result.byteCount).toEqual(0x10);
     expect(result.address).toEqual(0xfff0);
     expect(result.recordType).toEqual(0x00);
-    expect(result.data).toEqual(
-      new Uint8Array([
-        0x9b,
-        0x6d,
-        0x98,
-        0x47,
-        0xa0,
-        0x68,
-        0x10,
-        0xf0,
-        0x39,
-        0xff,
-        0x06,
-        0x21,
-        0xa0,
-        0x68,
-        0x10,
-        0xf0,
-      ])
-    );
+    const a = [0x9b, 0x6d, 0x98, 0x47, 0xa0, 0x68, 0x10, 0xf0];
+    const b = [0x39, 0xff, 0x06, 0x21, 0xa0, 0x68, 0x10, 0xf0];
+    expect(result.data).toEqual(new Uint8Array(a.concat(b)));
     expect(result.checksum).toEqual(0xab);
+  });
 
-    result = ihex.parseRecord(':08AEE0007C53FF7F010000001C');
+  it('Parses data records of different lengths (8)', () => {
+    const result = ihex.parseRecord(':08AEE0007C53FF7F010000001C');
+
     expect(result.byteCount).toEqual(0x08);
     expect(result.address).toEqual(0xaee0);
     expect(result.recordType).toEqual(0x00);
@@ -235,17 +246,11 @@ describe('Test parseRecord() for standard records', () => {
       new Uint8Array([0x7c, 0x53, 0xff, 0x7f, 0x01, 0x00, 0x00, 0x00])
     );
     expect(result.checksum).toEqual(0x1c);
-
-    result = ihex.parseRecord(':04F870000000000094');
-    expect(result.byteCount).toEqual(0x04);
-    expect(result.address).toEqual(0xf870);
-    expect(result.recordType).toEqual(0x00);
-    expect(result.data).toEqual(new Uint8Array([0x00, 0x00, 0x00, 0x00]));
-    expect(result.checksum).toEqual(0x94);
   });
 
-  it('Parses data records of different lengths', () => {
-    const result = ihex.parseRecord(':04F870000000000094\r\n');
+  it('Parses data records of different lengths (4)', () => {
+    const result = ihex.parseRecord(':04F870000000000094');
+
     expect(result.byteCount).toEqual(0x04);
     expect(result.address).toEqual(0xf870);
     expect(result.recordType).toEqual(0x00);
@@ -307,6 +312,14 @@ describe('Test extLinAddressRecord()', () => {
     expect(ihex.extLinAddressRecord(0x20000)).toEqual(':020000040002F8');
     expect(ihex.extLinAddressRecord(0x30000)).toEqual(':020000040003F7');
     expect(ihex.extLinAddressRecord(0x31234)).toEqual(':020000040003F7');
+    expect(ihex.extLinAddressRecord(0x40000)).toEqual(':020000040004F6');
+    expect(ihex.extLinAddressRecord(0x48264)).toEqual(':020000040004F6');
+    expect(ihex.extLinAddressRecord(0x50000)).toEqual(':020000040005F5');
+    expect(ihex.extLinAddressRecord(0x55555)).toEqual(':020000040005F5');
+    expect(ihex.extLinAddressRecord(0x60000)).toEqual(':020000040006F4');
+    expect(ihex.extLinAddressRecord(0x61230)).toEqual(':020000040006F4');
+    expect(ihex.extLinAddressRecord(0x70000)).toEqual(':020000040007F3');
+    expect(ihex.extLinAddressRecord(0x72946)).toEqual(':020000040007F3');
   });
 
   // TODO: Add tests for all thrown exceptions
@@ -339,6 +352,9 @@ describe('Test blockEndRecord()', () => {
     expect(ihex.blockEndRecord(0x10)).toEqual(
       ':1000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5'
     );
+    expect(ihex.blockEndRecord(0x20)).toEqual(
+      ':2000000BFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5'
+    );
   });
 
   it('Throws error when the number of bytes to pad is a negative value', () => {
@@ -365,6 +381,9 @@ describe('Test paddedDataRecord()', () => {
     expect(ihex.paddedDataRecord(0x9)).toEqual(':0900000CFFFFFFFFFFFFFFFFFFF4');
     expect(ihex.paddedDataRecord(0x10)).toEqual(
       ':1000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4'
+    );
+    expect(ihex.paddedDataRecord(0x20)).toEqual(
+      ':2000000CFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF4'
     );
   });
 
