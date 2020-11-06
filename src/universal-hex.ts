@@ -56,6 +56,9 @@ function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
     if (firstRecordType === ihex.RecordType.ExtendedLinearAddress) {
       currentExtAddr = hexRecords[ih];
       ih++;
+    } else if (firstRecordType === ihex.RecordType.ExtendedSegmentAddress) {
+      currentExtAddr = ihex.convertExtSegToLinAddressRecord(hexRecords[ih]);
+      ih++;
     }
     blockLines.push(currentExtAddr);
     blockLen += extAddrRecordLen + 1;
@@ -74,6 +77,8 @@ function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
         record = ihex.convertRecordTo(record, ihex.RecordType.CustomData);
       } else if (recordType === ihex.RecordType.ExtendedLinearAddress) {
         currentExtAddr = record;
+      } else if (recordType === ihex.RecordType.ExtendedSegmentAddress) {
+        currentExtAddr = ihex.convertExtSegToLinAddressRecord(record);
       } else if (recordType === ihex.RecordType.EndOfFile) {
         endOfFile = true;
         break;
