@@ -397,7 +397,7 @@ function iHexToRecordStrs(iHexStr: string): string[] {
  * Iterates through the beginning of an array of Intel Hex records to find the
  * longest record data field length.
  *
- * Once it finds 10 records at the maximum size found so far (starts at 16
+ * Once it finds 12 records at the maximum size found so far (starts at 16
  * bytes) it will stop iterating.
  *
  * This is useful to identify the expected max size of the data records for an
@@ -417,7 +417,7 @@ function findDataFieldLength(iHexRecords: string[]): number {
     } else if (dataBytesLength === maxDataBytes) {
       maxDataBytesCount++;
     }
-    if (maxDataBytesCount > 10) {
+    if (maxDataBytesCount > 12) {
       break;
     }
   }

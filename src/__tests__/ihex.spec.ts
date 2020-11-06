@@ -85,6 +85,12 @@ describe('Test createRecord() for standard records', () => {
       ihex.createRecord(-1, ihex.RecordType.Data, new Uint8Array([]));
     }).toThrow('address out of range');
   });
+
+  it('Throws error when the record is invalid', () => {
+    expect(() => {
+      ihex.createRecord(0, 0xff, new Uint8Array([]));
+    }).toThrow('is not valid');
+  });
 });
 
 describe('Test createRecord() for custom records', () => {
@@ -282,6 +288,20 @@ describe('Test parseRecord() for standard records', () => {
     }).toThrow('Could not parse');
   });
 
+  it('Throws error when record is invalid', () => {
+    expect(() => {
+      ihex.parseRecord(':000000');
+    }).toThrow('Record length too small');
+  });
+
+  it('Throws error when record is too large', () => {
+    expect(() => {
+      ihex.parseRecord(
+        ':2000600031F8000039F8000041F800008FFA00008FFA00008FFA00008FFA00008FFA0000FF40'
+      );
+    }).toThrow('Record length is too large');
+  });
+
   // TODO: Add tests for parsing EoF records
   // TODO: Add tests for parsing ExtendedSegmentAddress records
   // TODO: Add tests for parsing StartSegmentAddress records
@@ -322,7 +342,11 @@ describe('Test extLinAddressRecord()', () => {
     expect(ihex.extLinAddressRecord(0x72946)).toEqual(':020000040007F3');
   });
 
-  // TODO: Add tests for all thrown exceptions
+  it('Throws error when address is out of range', () => {
+    expect(() => {
+      ihex.extLinAddressRecord(0x100000000);
+    }).toThrow('Address record is out of range');
+  });
 });
 
 describe('Test blockStartRecord()', () => {
@@ -544,5 +568,91 @@ describe('Test iHexToRecordStrs()', () => {
 
   it('Empty input string outputs empty array', () => {
     expect(ihex.iHexToRecordStrs('')).toEqual([]);
+  });
+});
+
+describe('Test findDataFieldLength()', () => {
+  it('Standard 16-byte record hex', () => {
+    const records = [
+      ':020000040000FA',
+      ':10000000C0070000D1060000D1000000B1060000CA',
+      ':1000100000000000000000000000000000000000E0',
+      ':100020000000000000000000000000005107000078',
+      ':100030000000000000000000DB000000E500000000',
+      ':10004000EF000000F9000000030100000D010000B6',
+      ':1000500017010000210100002B0100003501000004',
+      ':100160000968095808477020344909680958084740',
+      ':100170007420324909680958084778202F490968CE',
+      ':10018000095808477C202D490968095808478020EC',
+      ':100190002A490968095808478420284909680958E4',
+      ':020000040001F9',
+      ':10000000058209E003984179027909021143490404',
+      ':10001000490C0171090A417103AA04A90898FFF764',
+      ':1000200068FF0028EED0822C02D020460BB0F0BD35',
+      ':100030000020FBE730B50446406B002597B0002850',
+      ':00000001FF',
+    ];
+
+    const recordLength = ihex.findDataFieldLength(records);
+
+    expect(recordLength).toEqual(16);
+  });
+
+  it('Finds a mixed of records with enough 32 byte long records', () => {
+    const records = [
+      ':020000040000FA',
+      ':10000000C0070000D1060000D1000000B1060000CA',
+      ':1000100000000000000000000000000000000000E0',
+      ':100020000000000000000000000000005107000078',
+      ':100030000000000000000000DB000000E500000000',
+      ':10004000EF000000F9000000030100000D010000B6',
+      ':1000500017010000210100002B0100003501000004',
+      ':2000600031F8000039F8000041F800008FFA00008FFA00008FFA00008FFA00008FFA000040',
+      ':200080008FFA00008FFA00008FFA0000410101008FFA00008FFA00008FFA00008FFA00005E',
+      ':2000A0008FFA00008FFA000049F8000051F800008FFA00008FFA0000000000000000000092',
+      ':2000C0008FFA00008FFA00008FFA0000350101008FFA00008FFA00008FFA000000000000B3',
+      ':2000E000000000000000000000000000000000000000000000000000000000000000000000',
+      ':200100000000000000000000000000000000000000000000000000000000000000000000DF',
+      ':200120000000000000000000000000000000000000000000000000000000000000000000BF',
+      ':2001400000000000000000000000000000000000000000000000000000000000000000009F',
+      ':100160000968095808477020344909680958084740',
+      ':100170007420324909680958084778202F490968CE',
+      ':10018000095808477C202D490968095808478020EC',
+      ':100190002A490968095808478420284909680958E4',
+      ':1001A0000847882025490968095808478C202349B1',
+      ':1001B00009680958084790202049096809580847E4',
+      ':1001C00094201E4909680958084798201B49096866',
+      ':1001D000095808479C201949096809580847A02070',
+      ':020000040001F9',
+      ':10000000058209E003984179027909021143490404',
+      ':10001000490C0171090A417103AA04A90898FFF764',
+      ':1000200068FF0028EED0822C02D020460BB0F0BD35',
+      ':100030000020FBE730B50446406B002597B0002850',
+      ':200040000098C3F83415C3F83825D3F80012E26141F02001C3F800127A1906EB82025268EB',
+      ':2000600052B14FF404722948C3F8042303B0F0BD00293AD1002C3ED1D3F81021D3F8441186',
+      ':20008000D3F82441002AF3D03D4421481F4F214B002206EB8506944208BF3846B2619142E0',
+      ':2000A00018BF1846E2E70368A261C3F810E1D3F8100101900198C3F844E1D3F844010090A2',
+      ':2000C0000120E160C4F81CE0009CC3F83415C3F838251860C0E733B103680F484FF40472D0',
+      ':00000001FF',
+    ];
+
+    const recordLength = ihex.findDataFieldLength(records);
+
+    expect(recordLength).toEqual(32);
+  });
+
+  it('Longer than 32 byte records throws an error', () => {
+    const records = [
+      ':020000040000FA',
+      ':10000000C0070000D1060000D1000000B1060000CA',
+      ':2000600031F8000039F8000041F800008FFA00008FFA00008FFA00008FFA00008FFA000040',
+      ':300080008FFA00008FFA00008FFA0000410101008FFA00008FFA00008FFA00008FFA0000C0070000D1060000D1000000B106000028',
+      ':00000001FF',
+    ];
+    const throwsError = () => {
+      const recordLength = ihex.findDataFieldLength(records);
+    };
+
+    expect(throwsError).toThrow('data size is too large');
   });
 });
