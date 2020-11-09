@@ -11,6 +11,12 @@ TypeScript/JavaScript library to create micro:bit Universal Hexes.
 A raw draft of the docs can be found in
 https://microbit-foundation.github.io/microbit-universal-hex/.
 
+## Web Tool
+
+As an implementation example this web tool can be used to create a Universal Hex
+from two hex files:
+https://microbit-foundation.github.io/microbit-universal-hex/examples/webtool.html
+
 ## License
 
 This software is under the MIT open source license.
