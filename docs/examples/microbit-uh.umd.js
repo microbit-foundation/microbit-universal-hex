@@ -2978,7 +2978,8 @@
 	      } else if (recordType === RecordType.ExtendedLinearAddress) {
 	        currentExtAddr = record;
 	      } else if (recordType === RecordType.ExtendedSegmentAddress) {
-	        currentExtAddr = convertExtSegToLinAddressRecord(record);
+	        record = convertExtSegToLinAddressRecord(record);
+	        currentExtAddr = record;
 	      } else if (recordType === RecordType.EndOfFile) {
 	        endOfFile = true;
 	        break;
@@ -2991,7 +2992,7 @@
 	    if (endOfFile) {
 	      // Error if we encounter an EoF record and it's not the end of the file
 	      if (ih !== hexRecords.length) {
-	        throw new Error("EoF record found at line " + ih + " of " + hexRecords.length);
+	        throw new Error("EoF record found at record " + ih + " of " + hexRecords.length + " in Board ID " + boardId + " hex");
 	      } // The EoF record goes after the Block End Record, it won't break 512-byte
 	      // boundary as it was already calculated in the previous loop that it fits
 
@@ -3083,7 +3084,7 @@
 	  }
 
 	  if (ih !== hexRecords.length) {
-	    throw new Error("EoF record found at line " + ih + " of " + hexRecords.length);
+	    throw new Error("EoF record found at record " + ih + " of " + hexRecords.length + " in Board ID " + boardId + " hex ");
 	  } // Add to the section size calculation the minimum length for the Block End
 	  // record that will be placed at the end (no padding included yet)
 
@@ -3127,8 +3128,7 @@
 
 	  if (!hexes.length) return '';
 	  var iHexToCustomFormat = blocks ? iHexToCustomFormatBlocks : iHexToCustomFormatSection;
-	  var eofRecord = endOfFileRecord();
-	  var eofNlRecord = eofRecord + '\n';
+	  var eofNlRecord = endOfFileRecord() + '\n';
 	  var customHexes = []; // We remove the EoF record from all but the last hex file so that the last
 	  // blocks are padded and there is single EoF record
 
@@ -3137,10 +3137,6 @@
 
 	    if (customHex.endsWith(eofNlRecord)) {
 	      customHex = customHex.slice(0, customHex.length - eofNlRecord.length);
-	    } else if (customHex.endsWith(eofRecord)) {
-	      customHex = customHex.slice(0, customHex.length - eofRecord.length);
-	    } else {
-	      throw Error("Could not find the End Of File record on hex with Board ID " + hexes[i].boardId);
 	    }
 
 	    customHexes.push(customHex);
@@ -3224,11 +3220,10 @@
 	      hexes[currentBoardId].hex.push(convertRecordTo(record, RecordType.Data));
 	    } else if (recordType === RecordType.ExtendedLinearAddress) {
 	      // Extended Linear Address can be found as the start of a new block
-	      // No need to check array size as we known there will always be an EoF
+	      // No need to check array size as it's confirmed hex ends with an EoF
 	      var nextRecord = records[i + 1];
-	      var nextRecordType = getRecordType(nextRecord);
 
-	      if (nextRecordType === RecordType.BlockStart) {
+	      if (getRecordType(nextRecord) === RecordType.BlockStart) {
 	        // Processes the Block Start record (only first 2 bytes for Board ID)
 	        var blockStartData = getRecordData(nextRecord);
 

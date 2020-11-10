@@ -262,16 +262,20 @@
           console.error(errorMsg);
           alert(errorMsg);
         }
-        let universalHex = microbitUh.createUniversalHex([
-          {
-            hex: v1HexStr,
-            boardId: 0x9900,
-          },
-          {
-            hex: v2HexStr,
-            boardId: 0x9903,
-          },
-        ]);
+        try {
+          let universalHex = microbitUh.createUniversalHex([
+            {
+              hex: v1HexStr,
+              boardId: 0x9900,
+            },
+            {
+              hex: v2HexStr,
+              boardId: 0x9903,
+            },
+          ]);
+        } catch (e) {
+          return alert(e);
+        }
         downloadTextFile('universal-hex.hex', universalHex);
       });
     </script>
