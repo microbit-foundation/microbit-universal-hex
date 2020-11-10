@@ -17,7 +17,10 @@ jobs:
             - v1-dependencies-
       - run: npm ci
       - run:
-          name: Run tests
+          name: Run coverage tests
+          command: npm run test:coverage
+      - run:
+          name: Run build
           command: npm run build
       - save_cache:
           paths:
@@ -26,6 +29,8 @@ jobs:
       - persist_to_workspace:
           root: ~/repo
           paths: .
+      - store_artifacts:
+          path: ~/repo/dist
   deploy:
     <<: *defaults
     steps:
