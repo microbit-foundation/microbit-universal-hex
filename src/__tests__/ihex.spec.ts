@@ -524,6 +524,28 @@ describe('Test iHexToRecordStrs()', () => {
     ]);
   });
 
+  it('No new lines at the last record', () => {
+    const hexStr =
+      ':020000040000FA\n' +
+      ':1001000D084748204D490968095808474C204B4974\n' +
+      ':1001100D096809580847502048490968095808478F\n' +
+      ':020000040003F7\n' +
+      ':1001200D5420464909680958084758204349096829\n' +
+      ':00000001FF';
+    const hexStrWin = hexStr.replace(/\n/g, '\r\n');
+    const expectedResult = [
+      ':020000040000FA',
+      ':1001000D084748204D490968095808474C204B4974',
+      ':1001100D096809580847502048490968095808478F',
+      ':020000040003F7',
+      ':1001200D5420464909680958084758204349096829',
+      ':00000001FF',
+    ];
+
+    expect(ihex.iHexToRecordStrs(hexStr)).toEqual(expectedResult);
+    expect(ihex.iHexToRecordStrs(hexStrWin)).toEqual(expectedResult);
+  });
+
   it('Mixed carriage returns and new lines', () => {
     expect(
       ihex.iHexToRecordStrs(

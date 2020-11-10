@@ -91,7 +91,7 @@ function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
       // Error if we encounter an EoF record and it's not the end of the file
       if (ih !== hexRecords.length) {
         throw new Error(
-          `EoF record found at line ${ih} of ${hexRecords.length}`
+          `EoF record found at line ${ih} of ${hexRecords.length} in Board ID ${boardId}`
         );
       }
       // The EoF record goes after the Block End Record, it won't break 512-byte
@@ -186,7 +186,9 @@ function iHexToCustomFormatSection(iHexStr: string, boardId: number): string {
     }
   }
   if (ih !== hexRecords.length) {
-    throw new Error(`EoF record found at line ${ih} of ${hexRecords.length}`);
+    throw new Error(
+      `EoF record found at line ${ih} of ${hexRecords.length} in Board ID ${boardId}`
+    );
   }
 
   // Add to the section size calculation the minimum length for the Block End
@@ -225,8 +227,7 @@ function createUniversalHex(hexes: IndividualHex[], blocks = false): string {
     ? iHexToCustomFormatBlocks
     : iHexToCustomFormatSection;
 
-  const eofRecord = ihex.endOfFileRecord();
-  const eofNlRecord = eofRecord + '\n';
+  const eofNlRecord = ihex.endOfFileRecord() + '\n';
   const customHexes: string[] = [];
   // We remove the EoF record from all but the last hex file so that the last
   // blocks are padded and there is single EoF record
@@ -234,12 +235,6 @@ function createUniversalHex(hexes: IndividualHex[], blocks = false): string {
     let customHex = iHexToCustomFormat(hexes[i].hex, hexes[i].boardId);
     if (customHex.endsWith(eofNlRecord)) {
       customHex = customHex.slice(0, customHex.length - eofNlRecord.length);
-    } else if (customHex.endsWith(eofRecord)) {
-      customHex = customHex.slice(0, customHex.length - eofRecord.length);
-    } else {
-      throw Error(
-        `Could not find the End Of File record on hex with Board ID ${hexes[i].boardId}`
-      );
     }
     customHexes.push(customHex);
   }
@@ -331,10 +326,9 @@ function separateUniversalHex(universalHexStr: string): IndividualHex[] {
       );
     } else if (recordType === ihex.RecordType.ExtendedLinearAddress) {
       // Extended Linear Address can be found as the start of a new block
-      // No need to check array size as we known there will always be an EoF
+      // No need to check array size as it's confirmed hex ends with an EoF
       const nextRecord = records[i + 1];
-      const nextRecordType = ihex.getRecordType(nextRecord);
-      if (nextRecordType === ihex.RecordType.BlockStart) {
+      if (ihex.getRecordType(nextRecord) === ihex.RecordType.BlockStart) {
         // Processes the Block Start record (only first 2 bytes for Board ID)
         const blockStartData = ihex.getRecordData(nextRecord);
         if (blockStartData.length !== 4) {
@@ -375,6 +369,6 @@ export {
   iHexToCustomFormatBlocks,
   iHexToCustomFormatSection,
   createUniversalHex,
-  isUniversalHex,
   separateUniversalHex,
+  isUniversalHex,
 };

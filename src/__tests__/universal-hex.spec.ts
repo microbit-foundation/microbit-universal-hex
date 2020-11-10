@@ -426,7 +426,7 @@ describe('Test iHexToCustomFormatBlocks()', () => {
 });
 
 describe('Test iHexToCustomFormatSection()', () => {
-  it('Pads blocks with additional records to reach 512 512 byte boundary (16)..', () => {
+  it('Pads blocks with additional records to reach 512 byte boundary (16)..', () => {
     const hexStr16 =
       ':020000040000FA\n' +
       ':10F2D00061FF10BDB1F2030010B508461146FCF7FE\n' +
@@ -1009,6 +1009,80 @@ describe('Test createUniversalHex()', () => {
 
     expect(result).toEqual('');
   });
+
+  it('Intel Hex without EoF record ends in one', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':0400000A9900C0DEBB\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n';
+    const normalHexWin = normalHex.replace(/\n/g, '\r\n');
+
+    const resultSingle = uh.createUniversalHex([
+      { hex: normalHexWin, boardId: 0x9903 },
+    ]);
+    const resultDouble = uh.createUniversalHex([
+      { hex: normalHexWin, boardId: 0x9900 },
+      { hex: normalHex, boardId: 0x9903 },
+    ]);
+
+    expect(resultSingle.endsWith(':00000001FF\n')).toBeTruthy();
+    expect(resultDouble.endsWith(':00000001FF\n')).toBeTruthy();
+  });
+
+  it('Intel Hex with EoF in the middle throws errors', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':0400000A9900C0DEBB\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n';
+    const normalHexEof12 = normalHex.replace(
+      ':10008000678E0100678E0100678E0100678E010098\n',
+      ':10008000678E0100678E0100678E0100678E010098\n' + ':00000001FF\n'
+    );
+    const normalHexEof10 = normalHex.replace(
+      ':1000600069E80000D59A0100D9930100678E01006C\n',
+      ':1000600069E80000D59A0100D9930100678E01006C\n' + ':00000001FF\n'
+    );
+
+    const failFirst = () => {
+      const result = uh.createUniversalHex([
+        { hex: normalHexEof10, boardId: 0x9900 },
+        { hex: normalHex, boardId: 0x9903 },
+      ]);
+    };
+    const failSecond = () => {
+      const result = uh.createUniversalHex([
+        { hex: normalHex, boardId: 0x9900 },
+        { hex: normalHexEof12, boardId: 0x9903 },
+      ]);
+    };
+
+    expect(failFirst).toThrow(
+      'EoF record found at line 10 of 14 in Board ID 39168'
+    );
+    expect(failSecond).toThrow(
+      'EoF record found at line 12 of 14 in Board ID 39171'
+    );
+  });
 });
 
 describe('Test isUniversalHex()', () => {
@@ -1252,26 +1326,57 @@ describe('Loopback Intel Hex to Universal Hex', () => {
       ':1056E00080220020ED00D20415437F3BFB18424688\n' +
       ':1056F0005746591C62408C4607430F2F5CD86F49B0\n' +
       ':00000001FF\n';
+    const hexStrWin = hexStr.replace(/\n/g, '\r\n');
 
     const universalHexBlocks = uh.iHexToCustomFormatBlocks(hexStr, 0x9901);
+    const universalHexBlocksWin = uh.iHexToCustomFormatBlocks(
+      hexStrWin,
+      0x9901
+    );
     const universalHexSection = uh.iHexToCustomFormatSection(hexStr, 0x9901);
-    const universalHex = uh.createUniversalHex([
+    const universalHexSectionWin = uh.iHexToCustomFormatSection(
+      hexStrWin,
+      0x9901
+    );
+    const universalHexMultipleDefault = uh.createUniversalHex([
       { hex: hexStr, boardId: 0x9901 },
-      { hex: hexStr, boardId: 0x9902 },
+      { hex: hexStrWin, boardId: 0x9902 },
       { hex: hexStr, boardId: 0x9903 },
-      { hex: hexStr, boardId: 0x9904 },
+      { hex: hexStrWin, boardId: 0x9904 },
     ]);
+    const universalHexMultipleBlocks = uh.createUniversalHex(
+      [
+        { hex: hexStr, boardId: 0x9901 },
+        { hex: hexStrWin, boardId: 0x9902 },
+        { hex: hexStr, boardId: 0x9903 },
+        { hex: hexStrWin, boardId: 0x9904 },
+      ],
+      true
+    );
 
     const resultBlocks = uh.separateUniversalHex(universalHexBlocks);
+    const resultBlocksWin = uh.separateUniversalHex(universalHexBlocksWin);
     const resultSection = uh.separateUniversalHex(universalHexSection);
-    const result = uh.separateUniversalHex(universalHex);
+    const resultSectionWin = uh.separateUniversalHex(universalHexSectionWin);
+    const resultMultipleDefault = uh.separateUniversalHex(
+      universalHexMultipleDefault
+    );
+    const resultMultipleBlocks = uh.separateUniversalHex(
+      universalHexMultipleBlocks
+    );
 
     expect(resultBlocks[0].hex).toEqual(hexStr);
+    expect(resultBlocksWin[0].hex).toEqual(hexStr);
     expect(resultSection[0].hex).toEqual(hexStr);
-    expect(result[0].hex).toEqual(hexStr);
-    expect(result[1].hex).toEqual(hexStr);
-    expect(result[2].hex).toEqual(hexStr);
-    expect(result[3].hex).toEqual(hexStr);
+    expect(resultSectionWin[0].hex).toEqual(hexStr);
+    expect(resultMultipleDefault[0].hex).toEqual(hexStr);
+    expect(resultMultipleDefault[1].hex).toEqual(hexStr);
+    expect(resultMultipleDefault[2].hex).toEqual(hexStr);
+    expect(resultMultipleDefault[3].hex).toEqual(hexStr);
+    expect(resultMultipleBlocks[0].hex).toEqual(hexStr);
+    expect(resultMultipleBlocks[1].hex).toEqual(hexStr);
+    expect(resultMultipleBlocks[2].hex).toEqual(hexStr);
+    expect(resultMultipleBlocks[3].hex).toEqual(hexStr);
   });
 
   it('From full MakeCode files Blocks', () => {
