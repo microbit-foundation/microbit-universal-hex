@@ -1159,16 +1159,16 @@ describe('Test createUniversalHex()', () => {
     };
 
     expect(failFirstBlocks).toThrow(
-      'EoF record found at line 10 of 14 in Board ID 39168'
+      'EoF record found at record 10 of 14 in Board ID 39168 hex'
     );
     expect(failFirstSections).toThrow(
-      'EoF record found at line 10 of 14 in Board ID 39168'
+      'EoF record found at record 10 of 14 in Board ID 39168 hex'
     );
     expect(failSecondBlocks).toThrow(
-      'EoF record found at line 12 of 14 in Board ID 39171'
+      'EoF record found at record 12 of 14 in Board ID 39171 hex'
     );
     expect(failSecondSections).toThrow(
-      'EoF record found at line 12 of 14 in Board ID 39171'
+      'EoF record found at record 12 of 14 in Board ID 39171 hex'
     );
   });
 });

@@ -92,7 +92,7 @@ function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
       // Error if we encounter an EoF record and it's not the end of the file
       if (ih !== hexRecords.length) {
         throw new Error(
-          `EoF record found at line ${ih} of ${hexRecords.length} in Board ID ${boardId}`
+          `EoF record found at record ${ih} of ${hexRecords.length} in Board ID ${boardId} hex`
         );
       }
       // The EoF record goes after the Block End Record, it won't break 512-byte
@@ -188,7 +188,7 @@ function iHexToCustomFormatSection(iHexStr: string, boardId: number): string {
   }
   if (ih !== hexRecords.length) {
     throw new Error(
-      `EoF record found at line ${ih} of ${hexRecords.length} in Board ID ${boardId}`
+      `EoF record found at record ${ih} of ${hexRecords.length} in Board ID ${boardId} hex `
     );
   }
 
