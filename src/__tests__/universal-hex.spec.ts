@@ -1127,23 +1127,47 @@ describe('Test createUniversalHex()', () => {
       ':1000600069E80000D59A0100D9930100678E01006C\n' + ':00000001FF\n'
     );
 
-    const failFirst = () => {
+    const failFirstBlocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHexEof10, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failFirstSections = () => {
       const result = uh.createUniversalHex([
         { hex: normalHexEof10, boardId: 0x9900 },
         { hex: normalHex, boardId: 0x9903 },
       ]);
     };
-    const failSecond = () => {
+    const failSecondBlocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: normalHexEof12, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failSecondSections = () => {
       const result = uh.createUniversalHex([
         { hex: normalHex, boardId: 0x9900 },
         { hex: normalHexEof12, boardId: 0x9903 },
       ]);
     };
 
-    expect(failFirst).toThrow(
+    expect(failFirstBlocks).toThrow(
       'EoF record found at line 10 of 14 in Board ID 39168'
     );
-    expect(failSecond).toThrow(
+    expect(failFirstSections).toThrow(
+      'EoF record found at line 10 of 14 in Board ID 39168'
+    );
+    expect(failSecondBlocks).toThrow(
+      'EoF record found at line 12 of 14 in Board ID 39171'
+    );
+    expect(failSecondSections).toThrow(
       'EoF record found at line 12 of 14 in Board ID 39171'
     );
   });
