@@ -42,7 +42,10 @@
     "format": "prettier --config prettier.config.js \"**/*.{ts,tsx,js,jsx,css,scss,sass,less,md}\"",
     "format:fix": "npm run format -- --write",
     "lint": "tslint --project tsconfig.json --format codeFrame",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "docs:build": "typedoc --options config/typedoc.json",
+    "docs:minify": "html-minifier --input-dir ./docs/api/ --output-dir ./docs/api/ --file-ext html --collapse-whitespace",
+    "docs": "npm run docs:build && npm run docs:minify"
   },
   "peerDependencies": {
     "tslib": ">=1.11.1"
@@ -58,6 +61,7 @@
     "@types/jest": "^25.2.1",
     "@types/node": "^13.11.1",
     "@types/prettier": "^2.0.0",
+    "html-minifier": "^4.0.0",
     "jest": "^25.3.0",
     "jest-watch-typeahead": "^0.5.0",
     "prettier": "^2.0.4",
@@ -72,6 +76,8 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-standard": "^9.0.0",
     "tslint-etc": "^1.10.1",
+    "typedoc": "^0.19.2",
+    "typedoc-neo-theme": "^1.0.10",
     "typescript": "^3.8.3"
   }
 }

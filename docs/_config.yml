@@ -7,6 +7,10 @@ kramdown:
   # Interprets line breaks literally
   hard_wrap: false
 
+# Exclude this file as it will be used for the TypeDoc API docs generator
+exclude:
+  - api-readme.md
+
 # Just The Docs settings
 
 # Enable or disable the site search
