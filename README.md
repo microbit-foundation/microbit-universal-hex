@@ -13,9 +13,12 @@ https://microbit-foundation.github.io/microbit-universal-hex/.
 
 ## Web Tool
 
-As an implementation example this web tool can be used to create a Universal Hex
-from two hex files:
-https://microbit-foundation.github.io/microbit-universal-hex/examples/webtool.html
+An implementation example can be found in the
+[docs/examples/webtool.html](docs/examples/webtool.html) file. This web tool can
+generate a Universal Hex from two Intel Hex files.
+
+It can be accessed online via:
+https://tech.microbit.org/software/universal-hex-creator/
 
 ## License
 
