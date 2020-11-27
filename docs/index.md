@@ -10,7 +10,7 @@ nav_order: 1
 
 {: .fs-9 }
 
-<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 100px; float: left; padding-right: 16px;">
+<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 125px; float: left; padding-right: 16px;">
 
 Create Universal Hex files for the micro:bit.
 {: .fs-6 .fw-300 }
