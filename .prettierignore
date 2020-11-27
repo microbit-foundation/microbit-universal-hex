@@ -1,3 +1,4 @@
 dist
 coverage
-docs/examples/microbit-uh.umd.js
+docs/examples/microbit-uh.umd.min.js
+docs/api/*
