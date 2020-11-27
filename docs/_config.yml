@@ -19,5 +19,8 @@ search_enabled: true
 aux_links:
   'View on GitHub':
     - 'https://github.com/microbit-foundation/microbit-universal-hex/'
+aux_links_new_tab: true
 # Color scheme currently only supports "dark" or nil (default)
 color_scheme: 'light'
+# Create URL anchors for headings
+heading_anchors: true
