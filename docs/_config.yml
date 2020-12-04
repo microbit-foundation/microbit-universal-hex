@@ -13,7 +13,7 @@ exclude:
 
 # Just The Docs settings
 
-logo: 'docs/img/microbit-uh-logo-text.png'
+logo: 'img/microbit-uh-logo-text.png'
 # Enable or disable the site search
 search_enabled: true
 # Aux links for the upper right navigation

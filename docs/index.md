@@ -10,16 +10,30 @@ nav_order: 1
 
 {: .fs-9 }
 
-<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 125px; float: left; padding-right: 16px;">
+<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 164px; float: left; padding-right: 16px;">
 
 Create Universal Hex files for the micro:bit.
 {: .fs-6 .fw-300 }
 
-[Quick Guide](quick-guide.html){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[View it on GitHub](https://github.com/microbit-foundation/microbit-universal-hex/){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Quick Guide](quick-guide.html){: .btn .btn-primary .mb-4 .mb-md-0 .mr-2 }
+[API](api/){: .btn .btn-blue .mb-4 .mb-md-0 .mr-2 }
+[View it on GitHub](https://github.com/microbit-foundation/microbit-universal-hex/){: .btn .mb-4 .mb-md-0 }
 
 ---
 
-The documentation is currently a work in progress.
+This is the documentation for the micro:bit Universal Hex library.
 
-The menu on the left shows you the available documentation.
+The original hex files for the micro:bit were using the
+[Intel Hex format](https://en.wikipedia.org/wiki/Intel_HEX). With the micro:bit
+V2 release a new hex format was created to be able to flash any micro:bit
+version with a single file.
+
+The Universal Hex file format can contain the binary data for multiple micro:bit
+board versions and this TypeScript/JavaScript library can be used to create a
+micro:bit Universal Hex from two or more micro:bit Intel Hex files.
+
+## Navigation
+
+⬅️ The menu on the left shows you the available documentation pages.
+⬆️ The header at the top contains search bar
+⬇️ If you'd like to contribute to the docs there is an edit link at the footer
