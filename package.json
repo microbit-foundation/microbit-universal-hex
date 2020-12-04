@@ -44,9 +44,7 @@
     "format:fix": "npm run format -- --write",
     "lint": "tslint --project tsconfig.json --format codeFrame",
     "lint:fix": "npm run lint -- --fix",
-    "docs:build": "typedoc --options config/typedoc.json",
-    "docs:minify": "html-minifier --input-dir ./docs/api/ --output-dir ./docs/api/ --file-ext html --collapse-whitespace",
-    "docs": "npm run docs:build && npm run docs:minify"
+    "docs": "typedoc --options config/typedoc.json"
   },
   "peerDependencies": {
     "tslib": ">=1.11.1"
@@ -62,7 +60,6 @@
     "@types/jest": "^25.2.1",
     "@types/node": "^13.11.1",
     "@types/prettier": "^2.0.0",
-    "html-minifier": "^4.0.0",
     "jest": "^25.3.0",
     "jest-watch-typeahead": "^0.5.0",
     "prettier": "^2.0.4",
