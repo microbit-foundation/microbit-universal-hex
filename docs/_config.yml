@@ -26,7 +26,7 @@ color_scheme: 'light'
 # Create URL anchors for headings
 heading_anchors: true
 # Footer appears at the bottom of every page's main content
-footer_content: 'Copyright &copy; 2017-2020 Micro:bit Educational Foundation and project contributors. Distributed under the <a href="https://github.com/microbit-foundation/microbit-universal-hex/blob/master/LICENSE.md">MIT open source license</a>.'
+footer_content: '&copy; 2020 Micro:bit Educational Foundation and project contributors. Distributed under the <a href="https://github.com/microbit-foundation/microbit-universal-hex/blob/master/LICENSE.md">MIT open source license</a>.'
 
 # Footer "Edit this page on GitHub" link text
 gh_edit_link: true

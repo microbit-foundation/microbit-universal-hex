@@ -16,10 +16,10 @@ Create Universal Hex files for the micro:bit.
 {: .fs-6 .fw-300 }
 
 [Quick Guide](quick-guide.html){: .btn .btn-primary .mb-4 .mb-md-0 .mr-2 }
-[API](api/){: .btn .btn-blue .mb-4 .mb-md-0 .mr-2 }
+[API](api/){: .btn .btn-purple .mb-4 .mb-md-0 .mr-2 }
 [View it on GitHub](https://github.com/microbit-foundation/microbit-universal-hex/){: .btn .mb-4 .mb-md-0 }
 
----
+<br><hr>
 
 This is the documentation for the micro:bit Universal Hex library.
 
@@ -34,6 +34,6 @@ micro:bit Universal Hex from two or more micro:bit Intel Hex files.
 
 ## Navigation
 
-⬅️ The menu on the left shows you the available documentation pages.
-⬆️ The header at the top contains search bar
-⬇️ If you'd like to contribute to the docs there is an edit link at the footer
+- ⬅️ The menu on the left shows you the available documentation pages.
+- ⬆️ The header at the top contains search bar
+- ⬇️ If you'd like to contribute to the docs there is an edit link at the footer

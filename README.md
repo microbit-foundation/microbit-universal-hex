@@ -1,11 +1,11 @@
 # micro:bit Universal Hex TypeScript Library
 
+<img width="30%" alt="microbit-universal-hex logo" src="docs/img/microbit-uh-logo.png" align="right">
+
 [![CircleCI](https://circleci.com/gh/microbit-foundation/microbit-universal-hex.svg?style=svg)](https://circleci.com/gh/microbit-foundation/microbit-universal-hex)
 
 TypeScript/JavaScript library to create micro:bit Universal Hex files for
 micro:bit.
-
-<img width="50%" alt="microbit-universal-hex logo" src="docs/img/microbit-uh-logo.png">
 
 The Universal Hex file format was created to be able to contain the binary data
 for micro:bit V1 and V2 boards in a single file, so that it works in all
