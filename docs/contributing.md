@@ -12,8 +12,7 @@ nav_order: 5
 
 {: .no_toc .text-delta }
 
-1. TOC
-   {:toc}
+1. TOC {:toc}
 
 ## How To Contribute
 
@@ -32,7 +31,7 @@ existing issue, or file a new one, and mention @microbit-carlos.
 
 ## Code Of Conduct
 
-WIP.
+A link to the Code of Conduct will soon be added here.
 
 ## Bugs
 
