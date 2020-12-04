@@ -13,6 +13,7 @@ exclude:
 
 # Just The Docs settings
 
+logo: 'docs/img/microbit-uh-logo-text.png'
 # Enable or disable the site search
 search_enabled: true
 # Aux links for the upper right navigation
@@ -24,3 +25,13 @@ aux_links_new_tab: true
 color_scheme: 'light'
 # Create URL anchors for headings
 heading_anchors: true
+# Footer appears at the bottom of every page's main content
+footer_content: 'Copyright &copy; 2017-2020 Micro:bit Educational Foundation and project contributors. Distributed under the <a href="https://github.com/microbit-foundation/microbit-universal-hex/blob/master/LICENSE.md">MIT open source license</a>.'
+
+# Footer "Edit this page on GitHub" link text
+gh_edit_link: true
+gh_edit_link_text: 'Edit this page on GitHub.'
+gh_edit_repository: 'https://github.com/microbit-foundation/microbit-universal-hex'
+gh_edit_branch: 'master'
+gh_edit_source: docs # the source that your files originate from
+gh_edit_view_mode: 'tree' # "tree" or "edit" if you want the user to jump into the editor immediately
