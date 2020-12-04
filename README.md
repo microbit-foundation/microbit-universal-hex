@@ -18,7 +18,7 @@ https://microbit-foundation.github.io/microbit-universal-hex/.
 
 ## Web Tool
 
-<img width="30%" alt="microbit-universal-hex logo" src="docs/img/web-tool-screenshot.png" align="left">
+<img width="18%" alt="microbit-universal-hex logo" src="docs/img/web-tool-screenshot.png" align="left">
 
 An implementation example can be found in the
 [docs/examples/webtool.html](docs/examples/webtool.html) file. This web tool can
@@ -31,4 +31,4 @@ https://tech.microbit.org/software/universal-hex-creator/
 
 This software is under the MIT open source license.
 
-SPDX-License-Identifier: MIT
+[SPDX-License-Identifier: MIT](LICENSE.md)

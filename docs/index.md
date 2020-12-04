@@ -10,7 +10,7 @@ nav_order: 1
 
 {: .fs-9 }
 
-<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 164px; float: left; padding-right: 16px;">
+<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 160px; float: left; padding-right: 16px;">
 
 Create Universal Hex files for the micro:bit.
 {: .fs-6 .fw-300 }
@@ -25,10 +25,10 @@ Create Universal Hex files for the micro:bit.
 
 This is the documentation for the micro:bit Universal Hex library.
 
-The original hex files for the micro:bit were using the
-[Intel Hex format](https://en.wikipedia.org/wiki/Intel_HEX). With the micro:bit
-V2 release a new hex format was created to be able to flash any micro:bit
-version with a single file.
+Originally the micro:bit hex files used the
+[Intel Hex format](https://en.wikipedia.org/wiki/Intel_HEX) and with the
+micro:bit V2 release a new hex format was created to be able to flash any
+micro:bit board version with a single file.
 
 The Universal Hex file format can contain the binary data for multiple micro:bit
 board versions and this TypeScript/JavaScript library can be used to create a

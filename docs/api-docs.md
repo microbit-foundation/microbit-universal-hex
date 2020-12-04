@@ -7,8 +7,10 @@ nav_order: 3
 # API Documentation
 
 The API documentation is generated independently of the rest of these docs and
-can be found here:
+can be found in this URL:
 [https://microbit-foundation.github.io/microbit-universal-hex/api/](https://microbit-foundation.github.io/microbit-universal-hex/api/)
+
+[Click here to open the API docs](api/){: .btn .btn-purple }
 
 The source code is well annotated with docstring and
 [TypeDoc](http://typedoc.org) is used to generate the API pages.

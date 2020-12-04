@@ -11,6 +11,11 @@ kramdown:
 exclude:
   - api-readme.md
 
+# Need to include files with underscore for Typedoc output pages
+include:
+  - '_*_.html'
+  - '_*_.*.html'
+
 # Just The Docs settings
 
 logo: 'img/microbit-uh-logo-text.png'
