@@ -12,3 +12,5 @@ can be found here:
 
 The source code is well annotated with docstring and
 [TypeDoc](http://typedoc.org) is used to generate the API pages.
+
+![Screenshot of an API page](img/api-screenshot.png)
