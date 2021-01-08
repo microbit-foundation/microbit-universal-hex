@@ -1,5 +1,6 @@
 /**
  * Generate and process Intel Hex records.
+ * @packageDocumentation
  *
  * (c) 2020 Micro:bit Educational Foundation and contributors.
  * SPDX-License-Identifier: MIT

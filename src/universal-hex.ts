@@ -1,6 +1,17 @@
 /**
- * Converts standard Intel Hex strings into a Universal Hex with records
- * organised in self contained 512-byte blocks.
+ * Convert between standard Intel Hex strings and Universal Hex strings.
+ *
+ * This module provides the main functionality to convert Intel Hex strings
+ * (with their respective Board IDs) into the Universal Hex format.
+ *
+ * It can also separate a Universal Hex string into the individual Intel Hex
+ * strings that forms it.
+ *
+ * The content here assumes familiarity with the
+ * [Universal Hex Specification](https://github.com/microbit-foundation/spec-universal-hex)
+ * and the rest of
+ * [this library documentation](https://microbit-foundation.github.io/microbit-universal-hex/).
+ * @packageDocumentation
  *
  * (c) 2020 Micro:bit Educational Foundation and the project contributors.
  * SPDX-License-Identifier: MIT
@@ -10,17 +21,43 @@ import * as ihex from './ihex';
 const V1_BOARD_IDS = [0x9900, 0x9901];
 const BLOCK_SIZE = 512;
 
-interface IndividualHex {
-  hex: string;
-  boardId: number;
+/**
+ * The Board ID is used to identify the different targets from a Universal Hex.
+ * In this case the target represents a micro:bit version.
+ * For micro:bit V1 (v1.3, v1.3B and v1.5) the `boardId` is `0x9900`, and for
+ * V2 `0x9903`.
+ */
+enum microbitBoardId {
+  V1 = 0x9900,
+  V2 = 0x9903,
 }
 
 /**
- * Converts an Intel Hex file string into a Universal Hex ready hex string using
- * custom records and 512 byte blocks.
+ * Very simple interface to group an Intel Hex string with a Board ID.
  *
- * More information on the format:
- *   https://github.com/microbit-foundation/universal-hex
+ * The Board ID is used in an Universal Hex file to identify the target, in this
+ * case the micro:bit version.
+ */
+interface IndividualHex {
+  /** The Intel Hex in string format. */
+  hex: string;
+  /**
+   * The Board ID identifies the target for the Intel Hex string.
+   * Any number can be used in this field, but to target a micro:bit the
+   * micro:bit firmware will process the data
+   */
+  boardId: number | microbitBoardId;
+}
+
+/**
+ * Converts an Intel Hex string into a Hex string using the 512 byte blocks
+ * format and the Universal Hex specific record types.
+ *
+ * The output of this function is not a fully formed Universal Hex, but one part
+ * of a Universal Hex, ready to be merged by the calling code.
+ *
+ * More information on this "block" format:
+ *   https://github.com/microbit-foundation/spec-universal-hex
  *
  * @throws {Error} When the Board ID is not between 0 and 2^16.
  * @throws {Error} When there is an EoF record not at the end of the file.
@@ -29,7 +66,10 @@ interface IndividualHex {
  *    byte blocks and the customer records.
  * @returns New Intel Hex string with the custom format.
  */
-function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
+function iHexToCustomFormatBlocks(
+  iHexStr: string,
+  boardId: number | microbitBoardId
+): string {
   // Hex files for v1.3 and v1.5 continue using the normal Data Record Type
   const replaceDataRecord = !V1_BOARD_IDS.includes(boardId);
 
@@ -121,11 +161,14 @@ function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
 }
 
 /**
- * Converts an Intel Hex file string into a Universal Hex ready hex string using
- * custom records and sections aligned with 512-byte boundaries.
+ * Converts an Intel Hex string into a Hex string using custom records and
+ * aligning the content size to a 512-byte boundary.
  *
- * More information on the format:
- *   https://github.com/microbit-foundation/universal-hex
+ * The output of this function is not a fully formed Universal Hex, but one part
+ * of a Universal Hex, ready to be merged by the calling code.
+ *
+ * More information on this "section" format:
+ *   https://github.com/microbit-foundation/spec-universal-hex
  *
  * @throws {Error} When the Board ID is not between 0 and 2^16.
  * @throws {Error} When there is an EoF record not at the end of the file.
@@ -134,7 +177,10 @@ function iHexToCustomFormatBlocks(iHexStr: string, boardId: number): string {
  *    byte blocks and the customer records.
  * @returns New Intel Hex string with the custom format.
  */
-function iHexToCustomFormatSection(iHexStr: string, boardId: number): string {
+function iHexToCustomFormatSection(
+  iHexStr: string,
+  boardId: number | microbitBoardId
+): string {
   const sectionLines: string[] = [];
   let sectionLen = 0;
   let ih = 0;
@@ -214,13 +260,19 @@ function iHexToCustomFormatSection(iHexStr: string, boardId: number): string {
 }
 
 /**
- * Creates a Universal Hex from an collection of Intel Hex strings and their
+ * Creates a Universal Hex from a collection of Intel Hex strings and their
  * board IDs.
  *
- * @param hexes An array of objects containing an Intel Hex strings and the
- *     board ID associated with it.
- * @param blocks Indicate if the Universal Hex should be blocks instead of
- *     sections.
+ * For the current micro:bit board versions use the values from the
+ * `microbitBoardId` enum.
+ *
+ * @param hexes An array of objects containing an Intel Hex string and the board
+ *     ID associated with it.
+ * @param blocks Indicate if the Universal Hex format should be "blocks"
+ *     instead of "sections". The current specification recommends using the
+ *     default "sections" format as is much quicker in micro:bits with DAPLink
+ *     version 0234.
+ * @returns A Universal Hex string.
  */
 function createUniversalHex(hexes: IndividualHex[], blocks = false): string {
   if (!hexes.length) return '';
@@ -257,8 +309,9 @@ function createUniversalHex(hexes: IndividualHex[], blocks = false): string {
  * Very simple test only checking for the opening Extended Linear Address and
  * Block Start records.
  *
- * The string is manually checked as this method can be x20 faster than breaking
- * the string into records and checking their types with the ihex functions.
+ * The string is manually iterated as this method can be x20 faster than
+ * breaking the string into records and checking their types with the ihex
+ * functions.
  *
  * @param hexStr Hex string to check
  * @return True if the hex is an Universal Hex.
@@ -281,7 +334,7 @@ function isUniversalHex(hexStr: string): boolean {
 }
 
 /**
- * Separates a Universal Hex into the individual hexes.
+ * Separates a Universal Hex into its individual Intel Hexes.
  *
  * @param universalHexStr Universal Hex string with the Universal Hex.
  * @returns An array of object with boardId and hex keys.
@@ -367,6 +420,8 @@ function separateUniversalHex(universalHexStr: string): IndividualHex[] {
 }
 
 export {
+  microbitBoardId,
+  IndividualHex,
   iHexToCustomFormatBlocks,
   iHexToCustomFormatSection,
   createUniversalHex,

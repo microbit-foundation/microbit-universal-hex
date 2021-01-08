@@ -1,5 +1,6 @@
 /**
  * General utilities.
+ * @packageDocumentation
  *
  * (c) 2020 Micro:bit Educational Foundation and the project contributors.
  * SPDX-License-Identifier: MIT
