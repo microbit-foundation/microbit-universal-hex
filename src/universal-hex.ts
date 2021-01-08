@@ -86,6 +86,11 @@ function iHexToCustomFormatBlocks(
   const hexRecords = ihex.iHexToRecordStrs(iHexStr);
   const recordPaddingCapacity = ihex.findDataFieldLength(hexRecords);
 
+  if (!hexRecords.length) return '';
+  if (isUniversalHexRecords(hexRecords)) {
+    throw new Error(`Board ID ${boardId} Hex is already a Universal Hex.`);
+  }
+
   // Each loop iteration corresponds to a 512-bytes block
   let ih = 0;
   const blockLines = [];
@@ -131,9 +136,16 @@ function iHexToCustomFormatBlocks(
     if (endOfFile) {
       // Error if we encounter an EoF record and it's not the end of the file
       if (ih !== hexRecords.length) {
-        throw new Error(
-          `EoF record found at record ${ih} of ${hexRecords.length} in Board ID ${boardId} hex`
-        );
+        // Might be MakeCode hex for V1 as they did this with the EoF record
+        if (isMakeCodeForV1HexRecords(hexRecords)) {
+          throw new Error(
+            `Board ID ${boardId} Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.`
+          );
+        } else {
+          throw new Error(
+            `EoF record found at record ${ih} of ${hexRecords.length} in Board ID ${boardId} hex`
+          );
+        }
       }
       // The EoF record goes after the Block End Record, it won't break 512-byte
       // boundary as it was already calculated in the previous loop that it fits
@@ -195,6 +207,9 @@ function iHexToCustomFormatSection(
 
   const hexRecords = ihex.iHexToRecordStrs(iHexStr);
   if (!hexRecords.length) return '';
+  if (isUniversalHexRecords(hexRecords)) {
+    throw new Error(`Board ID ${boardId} Hex is already a Universal Hex.`);
+  }
 
   // If first record is not an Extended Segmented/Linear Address we start at 0x0
   const iHexFirstRecordType = ihex.getRecordType(hexRecords[0]);
@@ -233,9 +248,16 @@ function iHexToCustomFormatSection(
     }
   }
   if (ih !== hexRecords.length) {
-    throw new Error(
-      `EoF record found at record ${ih} of ${hexRecords.length} in Board ID ${boardId} hex `
-    );
+    // The End Of File record was encountered mid-file, might be a MakeCode hex
+    if (isMakeCodeForV1HexRecords(hexRecords)) {
+      throw new Error(
+        `Board ID ${boardId} Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.`
+      );
+    } else {
+      throw new Error(
+        `EoF record found at record ${ih} of ${hexRecords.length} in Board ID ${boardId} hex `
+      );
+    }
   }
 
   // Add to the section size calculation the minimum length for the Block End
@@ -304,7 +326,7 @@ function createUniversalHex(hexes: IndividualHex[], blocks = false): string {
 }
 
 /**
- * Checks if the provided hex string is a universal hex.
+ * Checks if the provided hex string is a Universal Hex.
  *
  * Very simple test only checking for the opening Extended Linear Address and
  * Block Start records.
@@ -334,6 +356,61 @@ function isUniversalHex(hexStr: string): boolean {
 }
 
 /**
+ * Checks if the provided array of hex records form part of a Universal Hex.
+ *
+ * @param records Array of hex records to check.
+ * @return True if the records belong to a Universal Hex.
+ */
+function isUniversalHexRecords(records: string[]): boolean {
+  return (
+    ihex.getRecordType(records[0]) === ihex.RecordType.ExtendedLinearAddress &&
+    ihex.getRecordType(records[1]) === ihex.RecordType.BlockStart &&
+    ihex.getRecordType(records[records.length - 1]) ===
+      ihex.RecordType.EndOfFile
+  );
+}
+
+/**
+ * Checks if the array of records belongs to an Intel Hex file from MakeCode for
+ * micro:bit V1.
+ *
+ * @param records Array of hex records to check.
+ * @return True if the records belong to a MakeCode hex file for micro:bit V1.
+ */
+function isMakeCodeForV1HexRecords(records: string[]): boolean {
+  let i = records.indexOf(ihex.endOfFileRecord());
+  if (i === records.length - 1) {
+    // A MakeCode v0 hex file will place the metadata in RAM before the EoF
+    while (--i > 0) {
+      if (records[i] === ihex.extLinAddressRecord(0x20000000)) {
+        return true;
+      }
+    }
+  }
+  while (++i < records.length) {
+    // Other data records used to store the MakeCode project metadata (v2 and v3)
+    if (ihex.getRecordType(records[i]) === ihex.RecordType.OtherData) {
+      return true;
+    }
+    // In MakeCode v1 metadata went to RAM memory space 0x2000_0000
+    if (records[i] === ihex.extLinAddressRecord(0x20000000)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Checks if the Hex string is an Intel Hex file from MakeCode for micro:bit V1.
+ *
+ * @param hexStr Hex string to check
+ * @return True if the hex is an Universal Hex.
+ */
+function isMakeCodeForV1Hex(hexStr: string): boolean {
+  return isMakeCodeForV1HexRecords(ihex.iHexToRecordStrs(hexStr));
+}
+
+/**
  * Separates a Universal Hex into its individual Intel Hexes.
  *
  * @param universalHexStr Universal Hex string with the Universal Hex.
@@ -342,15 +419,8 @@ function isUniversalHex(hexStr: string): boolean {
 function separateUniversalHex(universalHexStr: string): IndividualHex[] {
   const records = ihex.iHexToRecordStrs(universalHexStr);
   if (!records.length) throw new Error('Empty Universal Hex.');
-
-  // The format has to start with an Extended Linear Address and Block Start
-  if (
-    ihex.getRecordType(records[0]) !== ihex.RecordType.ExtendedLinearAddress ||
-    ihex.getRecordType(records[1]) !== ihex.RecordType.BlockStart ||
-    ihex.getRecordType(records[records.length - 1]) !==
-      ihex.RecordType.EndOfFile
-  ) {
-    throw new Error('Universal Hex block format invalid.');
+  if (!isUniversalHexRecords(records)) {
+    throw new Error('Universal Hex format invalid.');
   }
 
   const passThroughRecords = [
@@ -427,4 +497,5 @@ export {
   createUniversalHex,
   separateUniversalHex,
   isUniversalHex,
+  isMakeCodeForV1Hex,
 };

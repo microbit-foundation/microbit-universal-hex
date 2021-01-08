@@ -1077,7 +1077,6 @@ describe('Test createUniversalHex()', () => {
   it('Intel Hex without EoF record ends in one', () => {
     const normalHex =
       ':020000040000FA\n' +
-      ':0400000A9900C0DEBB\n' +
       ':1000000000400020218E01005D8E01005F8E010006\n' +
       ':1000100000000000000000000000000000000000E0\n' +
       ':10002000000000000000000000000000618E0100E0\n' +
@@ -1106,7 +1105,6 @@ describe('Test createUniversalHex()', () => {
   it('Intel Hex with EoF in the middle throws errors', () => {
     const normalHex =
       ':020000040000FA\n' +
-      ':0400000A9900C0DEBB\n' +
       ':1000000000400020218E01005D8E01005F8E010006\n' +
       ':1000100000000000000000000000000000000000E0\n' +
       ':10002000000000000000000000000000618E0100E0\n' +
@@ -1116,8 +1114,7 @@ describe('Test createUniversalHex()', () => {
       ':1000600069E80000D59A0100D9930100678E01006C\n' +
       ':10007000678E0100678E0100678E0100678E0100A8\n' +
       ':10008000678E0100678E0100678E0100678E010098\n' +
-      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
-      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n';
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n';
     const normalHexEof12 = normalHex.replace(
       ':10008000678E0100678E0100678E0100678E010098\n',
       ':10008000678E0100678E0100678E0100678E010098\n' + ':00000001FF\n'
@@ -1159,17 +1156,368 @@ describe('Test createUniversalHex()', () => {
     };
 
     expect(failFirstBlocks).toThrow(
-      'EoF record found at record 10 of 14 in Board ID 39168 hex'
+      'EoF record found at record 9 of 12 in Board ID 39168 hex'
     );
     expect(failFirstSections).toThrow(
-      'EoF record found at record 10 of 14 in Board ID 39168 hex'
+      'EoF record found at record 9 of 12 in Board ID 39168 hex'
     );
     expect(failSecondBlocks).toThrow(
-      'EoF record found at record 12 of 14 in Board ID 39171 hex'
+      'EoF record found at record 11 of 12 in Board ID 39171 hex'
     );
     expect(failSecondSections).toThrow(
-      'EoF record found at record 12 of 14 in Board ID 39171 hex'
+      'EoF record found at record 11 of 12 in Board ID 39171 hex'
     );
+  });
+
+  it('Universal Hex input throws errors', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n' +
+      ':00000001FF\n';
+    const universalHex =
+      ':020000040000FA\n' +
+      ':0400000A9900C0DEBB\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n' +
+      ':00000001FF\n';
+
+    const failFirstBlocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: universalHex, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failFirstSections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: universalHex, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+    const failSecondBlocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: universalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failSecondSections = () => {
+      const result = uh.createUniversalHex([
+        { hex: normalHex, boardId: 0x9900 },
+        { hex: universalHex, boardId: 0x9903 },
+      ]);
+    };
+
+    expect(failFirstBlocks).toThrow(
+      'Board ID 39168 Hex is already a Universal Hex'
+    );
+    expect(failFirstSections).toThrow(
+      'Board ID 39168 Hex is already a Universal Hex'
+    );
+    expect(failSecondBlocks).toThrow(
+      'Board ID 39171 Hex is already a Universal Hex'
+    );
+    expect(failSecondSections).toThrow(
+      'Board ID 39171 Hex is already a Universal Hex'
+    );
+  });
+
+  it('MakeCode v1 and v2 Hex (micro:bit V1) throws custom error message', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n' +
+      ':00000001FF\n';
+    const microbitV1MakecodeV0 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':020000042000DA\n' +
+      ':1000000041140E2FB82FA2BB9A005F02000000001F\n' +
+      ':100010007B22636F6D7072657373696F6E223A2213\n' +
+      ':00000001FF\n' +
+      '\n';
+    const microbitV1MakecodeV1 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':00000001FF\n' +
+      '\n' +
+      ':020000042000DA\n' +
+      ':1000000041140E2FB82FA2BB9A005F02000000001F\n' +
+      ':100010007B22636F6D7072657373696F6E223A2213\n' +
+      '\n';
+    const microbitV1MakecodeV2 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':00000001FF\n' +
+      '\n' +
+      '\n' +
+      '\n' +
+      ':1000000E41140E2FB82FA2BB9A006E020000000002\n' +
+      ':1000100E7B22636F6D7072657373696F6E223A2205\n' +
+      '\n' +
+      '\n';
+
+    const failFirstV0Blocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV0, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failFirstV1Blocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV1, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failFirstV2Blocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV2, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failFirstV0Sections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV0, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+    const failFirstV1Sections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV1, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+    const failFirstV2Sections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV2, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+    const failSecondV0Blocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV0, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failSecondV1Blocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV1, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failSecondV2Blocks = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV2, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
+    const failSecondV0Sections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV0, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+    const failSecondV1Sections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV1, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+    const failSecondV2Sections = () => {
+      const result = uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV2, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
+
+    // To avoid performing too many checks that'll slow down createUniversalHex
+    // the V0 hex files will be able to be detected, and the MakeCode hex check
+    // is only performed when an E0F record is not at the end of the hex file
+    // expect(failFirstV0Blocks).toThrow(
+    //  'Board ID 39168 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex'
+    // );
+    expect(failFirstV1Blocks).toThrow(
+      'Board ID 39168 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex'
+    );
+    expect(failFirstV2Blocks).toThrow(
+      'Board ID 39168 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    );
+    // expect(failFirstV0Sections).toThrow(
+    //  'Board ID 39168 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    // );
+    expect(failFirstV1Sections).toThrow(
+      'Board ID 39168 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    );
+    expect(failFirstV2Sections).toThrow(
+      'Board ID 39168 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    );
+    // expect(failSecondV0Blocks).toThrow(
+    //  'Board ID 39171 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex'
+    // );
+    expect(failSecondV1Blocks).toThrow(
+      'Board ID 39171 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex'
+    );
+    expect(failSecondV2Blocks).toThrow(
+      'Board ID 39171 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    );
+    // expect(failSecondV0Sections).toThrow(
+    //  'Board ID 39171 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    // );
+    expect(failSecondV1Sections).toThrow(
+      'Board ID 39171 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    );
+    expect(failSecondV2Sections).toThrow(
+      'Board ID 39171 Hex is from MakeCode, import this hex into the MakeCode editor to create a Universal Hex.'
+    );
+  });
+});
+
+describe('Test isUniversalHex()', () => {
+  it('Detects a MakeCode V0 hex for micro:bit V1.', () => {
+    const microbitV1MakecodeV0 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':020000042000DA\n' +
+      ':1000000041140E2FB82FA2BB9A005F02000000001F\n' +
+      ':100010007B22636F6D7072657373696F6E223A2213\n' +
+      ':00000001FF\n' +
+      '\n';
+
+    const result = uh.isMakeCodeForV1Hex(microbitV1MakecodeV0);
+
+    expect(result).toBeTruthy();
+  });
+
+  it('Detects a MakeCode V1 hex for micro:bit V1.', () => {
+    const microbitV1MakecodeV1 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':00000001FF\n' +
+      '\n' +
+      ':020000042000DA\n' +
+      ':1000000041140E2FB82FA2BB9A005F02000000001F\n' +
+      ':100010007B22636F6D7072657373696F6E223A2213\n' +
+      '\n';
+
+    const result = uh.isMakeCodeForV1Hex(microbitV1MakecodeV1);
+
+    expect(result).toBeTruthy();
+  });
+
+  it('Detects a MakeCode V2/V3 hex for micro:bit V1.', () => {
+    const microbitV1MakecodeV2 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':00000001FF\n' +
+      '\n' +
+      '\n' +
+      '\n' +
+      ':1000000E41140E2FB82FA2BB9A006E020000000002\n' +
+      ':1000100E7B22636F6D7072657373696F6E223A2205\n' +
+      '\n' +
+      '\n';
+
+    const result = uh.isMakeCodeForV1Hex(microbitV1MakecodeV2);
+
+    expect(result).toBeTruthy();
+  });
+
+  it('A normal non MakeCode Intel Hex is not a false positive.', () => {
+    const normalHex =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':10002000000000000000000000000000618E0100E0\n' +
+      ':100030000000000000000000638E0100658E0100DA\n' +
+      ':10004000678E01005D3D000065950100678E01002F\n' +
+      ':10005000678E010000000000218F0100678E010003\n' +
+      ':1000600069E80000D59A0100D9930100678E01006C\n' +
+      ':10007000678E0100678E0100678E0100678E0100A8\n' +
+      ':10008000678E0100678E0100678E0100678E010098\n' +
+      ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
+      ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n' +
+      ':00000001FF\n';
+
+    const result = uh.isMakeCodeForV1Hex(normalHex);
+
+    expect(result).toBeFalsy();
   });
 });
 
