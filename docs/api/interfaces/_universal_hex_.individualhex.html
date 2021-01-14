@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IndividualHex | Universal Hex API Docs - v0.2.1</title>
+	<title>IndividualHex | Universal Hex API Docs - v0.2.2</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -24,7 +24,7 @@
 					</ul>
 					<ul class="results-priority" style="display:none">
 					</ul>
-					<a href="../index.html" class="title">Universal Hex API Docs - v0.2.1</a>
+					<a href="../index.html" class="title">Universal Hex API Docs - v0.2.2</a>
 					&emsp;<a href="" class="title"> | </a>
 					&emsp;<a href="https://github.com/microbit-foundation/spec-universal-hex/" class="title"> Universal Hex Spec </a>
 					&emsp;<a href="" class="title"> | </a>
@@ -83,7 +83,8 @@
 						<p>Very simple interface to group an Intel Hex string with a Board ID.</p>
 					</div>
 					</div><div class="tsd-comment tsd-typography tsd-comment-text">
-					<p>The Board ID is used in an Universal Hex file to identify</p>
+					<p>The Board ID is used in an Universal Hex file to identify the target, in this
+					case the micro:bit version.</p>
 			</div></section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
@@ -111,19 +112,21 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="boardid" class="tsd-anchor"></a>
 					<h3>board<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">board<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<div class="tsd-signature tsd-kind-icon">board<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-signature-type">microbitBoardId</a></div>
 					<aside class="tsd-sources">
 						<ul>
 							<li>Defined in
-								<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L33">
-									universal-hex.ts:33
+								<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L49">
+									universal-hex.ts:49
 								</a>
 							</li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography tsd-comment-shorttext">
 						<div class="lead">
-							<p>The Board ID identifies the target for the Intel Hex.</p>
+							<p>The Board ID identifies the target for the Intel Hex string.
+								Any number can be used in this field, but to target a micro:bit the
+							micro:bit firmware will process the data</p>
 						</div>
 					</div>
 				</section>
@@ -134,8 +137,8 @@
 					<aside class="tsd-sources">
 						<ul>
 							<li>Defined in
-								<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L31">
-									universal-hex.ts:31
+								<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L43">
+									universal-hex.ts:43
 								</a>
 							</li>
 						</ul>
@@ -152,6 +155,9 @@
 		<div class="col-2 col-menu secondary-menu">
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-module root">
+						<a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-kind-icon">microbit<wbr>Board<wbr>Id</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module root">
@@ -175,6 +181,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module root">
 						<a href="../modules/_universal_hex_.html#ihextocustomformatsection" class="tsd-kind-icon">i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Section</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module root">
+						<a href="../modules/_universal_hex_.html#ismakecodeforv1hex" class="tsd-kind-icon">is<wbr>Make<wbr>Code<wbr>For<wbr>V1Hex</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module root">
 						<a href="../modules/_universal_hex_.html#isuniversalhex" class="tsd-kind-icon">is<wbr>Universal<wbr>Hex</a>

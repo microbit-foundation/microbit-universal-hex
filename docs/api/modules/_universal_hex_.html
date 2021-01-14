@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>universal-hex | Universal Hex API Docs - v0.2.1</title>
+	<title>universal-hex | Universal Hex API Docs - v0.2.2</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -24,7 +24,7 @@
 					</ul>
 					<ul class="results-priority" style="display:none">
 					</ul>
-					<a href="../index.html" class="title">Universal Hex API Docs - v0.2.1</a>
+					<a href="../index.html" class="title">Universal Hex API Docs - v0.2.2</a>
 					&emsp;<a href="" class="title"> | </a>
 					&emsp;<a href="https://github.com/microbit-foundation/spec-universal-hex/" class="title"> Universal Hex Spec </a>
 					&emsp;<a href="" class="title"> | </a>
@@ -80,8 +80,8 @@
 						<p>Convert between standard Intel Hex strings and Universal Hex strings.</p>
 					</div>
 					</div><div class="tsd-comment tsd-typography tsd-comment-text">
-					<p>This module provides main functionality to convert Intel Hex strings
-					(together with their respective Board IDs) into the Universal Hex format.</p>
+					<p>This module provides the main functionality to convert Intel Hex strings
+					(with their respective Board IDs) into the Universal Hex format.</p>
 					<p>It can also separate a Universal Hex string into the individual Intel Hex
 					strings that forms it.</p>
 					<p>The content here assumes familiarity with the
@@ -92,6 +92,12 @@
 			<section class="tsd-panel-group tsd-index-group">
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Enumerations</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-enum tsd-parent-kind-module"><a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-kind-icon">microbitBoardId</a></li>
+							</ul>
+						</section>
 						<section class="tsd-index-section ">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
@@ -104,6 +110,7 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_universal_hex_.html#createuniversalhex" class="tsd-kind-icon">createUniversalHex</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_universal_hex_.html#ihextocustomformatblocks" class="tsd-kind-icon">iHexToCustomFormatBlocks</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_universal_hex_.html#ihextocustomformatsection" class="tsd-kind-icon">iHexToCustomFormatSection</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_universal_hex_.html#ismakecodeforv1hex" class="tsd-kind-icon">isMakeCodeForV1Hex</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_universal_hex_.html#isuniversalhex" class="tsd-kind-icon">isUniversalHex</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_universal_hex_.html#separateuniversalhex" class="tsd-kind-icon">separateUniversalHex</a></li>
 							</ul>
@@ -124,36 +131,42 @@
 							<aside class="tsd-sources">
 								<ul>
 									<li>Defined in
-										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L243">
-											universal-hex.ts:243
+										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L299">
+											universal-hex.ts:299
 										</a>
 									</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography tsd-comment-shorttext">
 								<div class="lead">
-									<p>Creates a Universal Hex from an collection of Intel Hex strings and their
+									<p>Creates a Universal Hex from a collection of Intel Hex strings and their
 									board IDs.</p>
 								</div>
+								</div><div class="tsd-comment tsd-typography tsd-comment-text">
+								<p>For the current micro:bit board versions use the values from the
+								<code>microbitBoardId</code> enum.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>hexes: <a href="../interfaces/_universal_hex_.individualhex.html" class="tsd-signature-type">IndividualHex</a><span class="tsd-signature-symbol">[]</span></h5>
 									<div class="tsd-comment tsd-typography tsd-comment-text">
-										<p>An array of objects containing an Intel Hex strings and the
-										board ID associated with it.</p>
+										<p>An array of objects containing an Intel Hex string and the board
+										ID associated with it.</p>
 									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> blocks: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></h5>
 									<div class="tsd-comment tsd-typography tsd-comment-text">
-										<p>Indicate if the Universal Hex should be blocks instead of
-										sections.</p>
+										<p>Indicate if the Universal Hex format should be &quot;blocks&quot;
+											instead of &quot;sections&quot;. The current specification recommends using the
+											default &quot;sections&quot; format as is much quicker in micro:bits with DAPLink
+										version 0234.</p>
 									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>A Universal Hex string.</p>
 						</li>
 					</ul>
 				</section>
@@ -161,26 +174,28 @@
 					<a name="ihextocustomformatblocks" class="tsd-anchor"></a>
 					<h3>i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Blocks</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Blocks<span class="tsd-signature-symbol">(</span>iHexStr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, boardId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Blocks<span class="tsd-signature-symbol">(</span>iHexStr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, boardId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-signature-type">microbitBoardId</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
 									<li>Defined in
-										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L50">
-											universal-hex.ts:50
+										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L69">
+											universal-hex.ts:69
 										</a>
 									</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography tsd-comment-shorttext">
 								<div class="lead">
-									<p>Converts an Intel Hex file string into a Universal Hex ready hex string using
-									custom records and 512 byte blocks.</p>
+									<p>Converts an Intel Hex string into a Hex string using the 512 byte blocks
+									format and the Universal Hex specific record types.</p>
 								</div>
 								</div><div class="tsd-comment tsd-typography tsd-comment-text">
-								<p>More information on the format:
+								<p>The output of this function is not a fully formed Universal Hex, but one part
+								of a Universal Hex, ready to be merged by the calling code.</p>
+								<p>More information on this &quot;block&quot; format:
 								<a href="https://github.com/microbit-foundation/spec-universal-hex">https://github.com/microbit-foundation/spec-universal-hex</a></p>
 								</div><div class="tsd-comment tsd-typography tsd-comment-tags">
 								<dl class="tsd-comment-tags"><dt>throws</dt>
@@ -199,7 +214,7 @@
 									</div>
 								</li>
 								<li>
-									<h5>boardId: <span class="tsd-signature-type">number</span></h5>
+									<h5>boardId: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-signature-type">microbitBoardId</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
@@ -211,26 +226,28 @@
 					<a name="ihextocustomformatsection" class="tsd-anchor"></a>
 					<h3>i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Section</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
-						<li class="tsd-signature tsd-kind-icon">i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Section<span class="tsd-signature-symbol">(</span>iHexStr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, boardId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+						<li class="tsd-signature tsd-kind-icon">i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Section<span class="tsd-signature-symbol">(</span>iHexStr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, boardId<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-signature-type">microbitBoardId</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
 									<li>Defined in
-										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L155">
-											universal-hex.ts:155
+										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L192">
+											universal-hex.ts:192
 										</a>
 									</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography tsd-comment-shorttext">
 								<div class="lead">
-									<p>Converts an Intel Hex file string into a Universal Hex ready hex string using
-									custom records and sections aligned with 512-byte boundaries.</p>
+									<p>Converts an Intel Hex string into a Hex string using custom records and
+									aligning the content size to a 512-byte boundary.</p>
 								</div>
 								</div><div class="tsd-comment tsd-typography tsd-comment-text">
-								<p>More information on the format:
+								<p>The output of this function is not a fully formed Universal Hex, but one part
+								of a Universal Hex, ready to be merged by the calling code.</p>
+								<p>More information on this &quot;section&quot; format:
 								<a href="https://github.com/microbit-foundation/spec-universal-hex">https://github.com/microbit-foundation/spec-universal-hex</a></p>
 								</div><div class="tsd-comment tsd-typography tsd-comment-tags">
 								<dl class="tsd-comment-tags"><dt>throws</dt>
@@ -249,11 +266,47 @@
 									</div>
 								</li>
 								<li>
-									<h5>boardId: <span class="tsd-signature-type">number</span></h5>
+									<h5>boardId: <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-signature-type">microbitBoardId</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
 							<p>New Intel Hex string with the custom format.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="ismakecodeforv1hex" class="tsd-anchor"></a>
+					<h3>is<wbr>Make<wbr>Code<wbr>For<wbr>V1Hex</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Make<wbr>Code<wbr>For<wbr>V1Hex<span class="tsd-signature-symbol">(</span>hexStr<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in
+										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L409">
+											universal-hex.ts:409
+										</a>
+									</li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography tsd-comment-shorttext">
+								<div class="lead">
+									<p>Checks if the Hex string is an Intel Hex file from MakeCode for micro:bit V1.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>hexStr: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography tsd-comment-text">
+										<p>Hex string to check</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+							<p>True if the hex is an Universal Hex.</p>
 						</li>
 					</ul>
 				</section>
@@ -268,21 +321,22 @@
 							<aside class="tsd-sources">
 								<ul>
 									<li>Defined in
-										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L284">
-											universal-hex.ts:284
+										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L341">
+											universal-hex.ts:341
 										</a>
 									</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography tsd-comment-shorttext">
 								<div class="lead">
-									<p>Checks if the provided hex string is a universal hex.</p>
+									<p>Checks if the provided hex string is a Universal Hex.</p>
 								</div>
 								</div><div class="tsd-comment tsd-typography tsd-comment-text">
 								<p>Very simple test only checking for the opening Extended Linear Address and
 								Block Start records.</p>
-								<p>The string is manually checked as this method can be x20 faster than breaking
-								the string into records and checking their types with the ihex functions.</p>
+								<p>The string is manually iterated as this method can be x20 faster than
+									breaking the string into records and checking their types with the ihex
+								functions.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -309,15 +363,15 @@
 							<aside class="tsd-sources">
 								<ul>
 									<li>Defined in
-										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L307">
-											universal-hex.ts:307
+										<a href="https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/universal-hex.ts#L419">
+											universal-hex.ts:419
 										</a>
 									</li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography tsd-comment-shorttext">
 								<div class="lead">
-									<p>Separates a Universal Hex into the individual hexes.</p>
+									<p>Separates a Universal Hex into its individual Intel Hexes.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -340,6 +394,9 @@
 		<div class="col-2 col-menu secondary-menu">
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-parent-kind-module root">
+						<a href="../enums/_universal_hex_.microbitboardid.html" class="tsd-kind-icon">microbit<wbr>Board<wbr>Id</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module root">
 						<a href="../interfaces/_universal_hex_.individualhex.html" class="tsd-kind-icon">Individual<wbr>Hex</a>
 					</li>
@@ -351,6 +408,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module root">
 						<a href="_universal_hex_.html#ihextocustomformatsection" class="tsd-kind-icon">i<wbr>Hex<wbr>ToCustom<wbr>Format<wbr>Section</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module root">
+						<a href="_universal_hex_.html#ismakecodeforv1hex" class="tsd-kind-icon">is<wbr>Make<wbr>Code<wbr>For<wbr>V1Hex</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module root">
 						<a href="_universal_hex_.html#isuniversalhex" class="tsd-kind-icon">is<wbr>Universal<wbr>Hex</a>
