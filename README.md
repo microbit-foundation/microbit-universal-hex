@@ -16,6 +16,14 @@ versions of the micro:bit.
 The documentation can be found in
 https://microbit-foundation.github.io/microbit-universal-hex/.
 
+## npm Package
+
+To add this package to your project:
+
+```
+npm install @microbit/microbit-universal-hex
+```
+
 ## Web Tool
 
 <img width="18%" alt="microbit-universal-hex logo" src="docs/img/web-tool-screenshot.png" align="left">

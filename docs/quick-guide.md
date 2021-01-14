@@ -8,7 +8,13 @@ nav_order: 2
 
 ## ES5 UMD Bundle
 
-Create a Universal Hex from two Intel Hex strings:
+Download the UMD bundle from a GitHub release and add it to the page:
+
+```html
+<script src="microbit-uh.umd.min.js"></script>
+```
+
+Then to create a Universal Hex from two Intel Hex strings:
 
 ```js
 var universalHex = microbitUh.createUniversalHex([
@@ -34,3 +40,10 @@ separatedBinaries.forEach(function (hexObj) {
   console.log(hexObj.hex);
 });
 ```
+
+## npm package
+
+You can integrate this library in your project using the npm package:
+https://www.npmjs.com/package/@microbit/microbit-universal-hex
+
+For information on how to use this library check the API documentation.
