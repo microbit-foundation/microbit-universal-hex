@@ -6,14 +6,6 @@ nav_order: 5
 
 # Contributing
 
-{: .no_toc }
-
-## Table of contents
-
-{: .no_toc .text-delta }
-
-1. TOC {:toc}
-
 ## How To Contribute
 
 Thanks for looking here! We'd love your help. The micro:bit project is only
