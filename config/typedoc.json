@@ -16,7 +16,7 @@
   "hideGenerator": false,
   "theme": "./node_modules/typedoc-neo-theme/bin/default",
   "source": [{
-    "path": "https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.1/src/",
+    "path": "https://github.com/microbit-foundation/microbit-universal-hex/tree/v0.2.2/src/",
     "line": "L"
   }],
   "links": [{
