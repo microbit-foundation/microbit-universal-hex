@@ -8,7 +8,9 @@ nav_order: 2
 
 ## ES5 UMD Bundle
 
-Download the UMD bundle from a GitHub release and add it to the page:
+Download the UMD bundle from the
+[latest GitHub release](https://github.com/microbit-foundation/microbit-universal-hex/releases/latest)
+and add it to the page:
 
 ```html
 <script src="microbit-uh.umd.min.js"></script>
@@ -44,6 +46,6 @@ separatedBinaries.forEach(function (hexObj) {
 ## npm package
 
 You can integrate this library in your project using the npm package:
-https://www.npmjs.com/package/@microbit/microbit-universal-hex
+[https://www.npmjs.com/package/@microbit/microbit-universal-hex](https://www.npmjs.com/package/@microbit/microbit-universal-hex)
 
 For information on how to use this library check the API documentation.

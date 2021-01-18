@@ -16,7 +16,7 @@ into the GitHub issue tracker to see what is available. Planned features are
 marked with the "enhancement" label, and know issues are marked with the "bug"
 label.
 
-https://github.com/microbit-foundation/microbit-universal-hex/issues
+[https://github.com/microbit-foundation/microbit-universal-hex/issues](https://github.com/microbit-foundation/microbit-universal-hex/issues)
 
 If you're interested in working on any of these items, please respond to an
 existing issue, or file a new one, and mention @microbit-carlos.
