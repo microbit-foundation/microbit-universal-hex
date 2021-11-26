@@ -65,7 +65,7 @@
         outline-offset: -10px;
         background-color: rgba(255, 255, 255, 0.2);
       }
-      #icon-v1, #icon-v2 {
+      #icon-uh, #icon-v2 {
         width: 100%;
         fill: #ffffff;
         margin-top: 26px;
@@ -83,7 +83,7 @@
       .label:hover strong {
         color: #fccfe2;
       }
-      #create {
+      #separate {
         position: absolute;
         left: 0;
         right: 0;
@@ -109,84 +109,50 @@
 
   <body>
     <h1>Universal Hex Creator</h1>
-    <div id="drop-v1" class="drop">
-      <h2>V1 Intel Hex</h2>
-      <svg id="icon-v1" xmlns="http://www.w3.org/2000/svg" width="50" height="43" viewBox="0 0 50 43">
+    <div id="drop-uh" class="drop">
+      <h2>Universal Hex</h2>
+      <svg id="icon-uh" xmlns="http://www.w3.org/2000/svg" width="50" height="43" viewBox="0 0 50 43">
         <path d="M48.4 26.5c-.9 0-1.7.7-1.7 1.7v11.6h-43.3v-11.6c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v13.2c0 .9.7 1.7 1.7 1.7h46.7c.9 0 1.7-.7 1.7-1.7v-13.2c0-1-.7-1.7-1.7-1.7zm-24.5 6.1c.3.3.8.5 1.2.5.4 0 .9-.2 1.2-.5l10-11.6c.7-.7.7-1.7 0-2.4s-1.7-.7-2.4 0l-7.1 8.3v-25.3c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v25.3l-7.1-8.3c-.7-.7-1.7-.7-2.4 0s-.7 1.7 0 2.4l10 11.6z" />
       </svg>
 
-      <input id="file-v1" type="file" class="file" />
-      <label id="label-v1" for="file-v1" class="label">
-        <strong>Select an Intel Hex file from your computer</strong><br />
+      <input id="file-uh" type="file" class="file" />
+      <label id="label-uh" for="file-uh" class="label">
+        <strong>Select a Universal Hex file from your computer</strong><br />
         <span>or drag and drop it here</span>
       </label>
     </div>
 
-    <div id="drop-v2" class="drop">
-      <h2>V2 Intel Hex</h2>
-      <svg id="icon-v2" xmlns="http://www.w3.org/2000/svg" width="50" height="43" viewBox="0 0 50 43">
-        <path d="M48.4 26.5c-.9 0-1.7.7-1.7 1.7v11.6h-43.3v-11.6c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v13.2c0 .9.7 1.7 1.7 1.7h46.7c.9 0 1.7-.7 1.7-1.7v-13.2c0-1-.7-1.7-1.7-1.7zm-24.5 6.1c.3.3.8.5 1.2.5.4 0 .9-.2 1.2-.5l10-11.6c.7-.7.7-1.7 0-2.4s-1.7-.7-2.4 0l-7.1 8.3v-25.3c0-.9-.7-1.7-1.7-1.7s-1.7.7-1.7 1.7v25.3l-7.1-8.3c-.7-.7-1.7-.7-2.4 0s-.7 1.7 0 2.4l10 11.6z" />
-      </svg>
-
-      <input id="file-v2" type="file" class="file" />
-      <label id="label-v2" for="file-v2" class="label">
-        <strong>Select an Intel Hex file from your computer</strong><br />
-        <span> or drag and drop it here</span>
-      </label>
-    </div>
-
-    <div id="create">
-      <button id="button">Create Universal Hex</button>
+    <div id="separate">
+      <button id="button">Separate Universal Hex</button>
     </div>
 
     <script type="text/javascript" src="microbit-uh.umd.min.js"></script>
 
     <script>
-      let dropV1El = document.getElementById('drop-v1');
-      let dropV2El = document.getElementById('drop-v2');
-      let fileV1El = document.getElementById('file-v1');
-      let fileV2El = document.getElementById('file-v2');
+      let dropUhEl = document.getElementById('drop-uh');
+      let fileUhEl = document.getElementById('file-uh');
 
       // Load Intel Hex files
-      let v1HexStr = null;
-      let v2HexStr = null;
-      const setV1Hex = function (file) {
+      let uHexStr = null;
+      const setUHex = function (file) {
         if (!file) return;
         const reader = new FileReader();
         reader.onloadend = function (evt) {
-          v1HexStr = evt.target.result;
-          console.log(v1HexStr);
-          document.getElementById('label-v1').textContent =
+          uHexStr = evt.target.result;
+          console.log(uHexStr);
+          document.getElementById('label-uh').textContent =
             'File "' + file.name + '" loaded';
-          document.getElementById('icon-v1').style.display = 'none';
-        };
-        reader.readAsText(file);
-      };
-      const setV2Hex = function (file) {
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onloadend = function (evt) {
-          v2HexStr = evt.target.result;
-          console.log(v2HexStr);
-          document.getElementById('label-v2').textContent =
-            'File "' + file.name + '" loaded';
-            document.getElementById('icon-v2').style.display = 'none';
+          document.getElementById('icon-uh').style.display = 'none';
         };
         reader.readAsText(file);
       };
 
       // Set up the file loading event listeners
-      fileV1El.addEventListener('change', function (event) {
-        setV1Hex(event.target.files[0]);
+      fileUhEl.addEventListener('change', function (event) {
+        setUHex(event.target.files[0]);
       });
-      fileV2El.addEventListener('change', function (event) {
-        setV2Hex(event.target.files[0]);
-      });
-      dropV1El.addEventListener('drop', function (event) {
-        setV1Hex(event.dataTransfer.files[0]);
-      });
-      dropV2El.addEventListener('drop', function (event) {
-        setV2Hex(event.dataTransfer.files[0]);
+      dropUhEl.addEventListener('drop', function (event) {
+        setUHex(event.dataTransfer.files[0]);
       });
 
       [
@@ -198,11 +164,7 @@
         'dragleave',
         'drop',
       ].forEach(function (eventName) {
-        dropV1El.addEventListener(eventName, function (event) {
-          event.preventDefault();
-          event.stopPropagation();
-        });
-        dropV2El.addEventListener(eventName, function (event) {
+        dropUhEl.addEventListener(eventName, function (event) {
           event.preventDefault();
           event.stopPropagation();
         });
@@ -210,19 +172,13 @@
 
       // Set the the listeners to highlight the drop area
       ['dragover', 'dragenter'].forEach(function (eventName) {
-        dropV1El.addEventListener(eventName, function (event) {
-          dropV1El.classList.add('hover');
-        });
-        dropV2El.addEventListener(eventName, function (event) {
-          dropV2El.classList.add('hover');
+        dropUhEl.addEventListener(eventName, function (event) {
+          dropUhEl.classList.add('hover');
         });
       });
       ['dragleave', 'dragend', 'drop'].forEach(function (eventName) {
-        dropV1El.addEventListener(eventName, function (event) {
-          dropV1El.classList.remove('hover');
-        });
-        dropV2El.addEventListener(eventName, function (event) {
-          dropV2El.classList.remove('hover');
+        dropUhEl.addEventListener(eventName, function (event) {
+          dropUhEl.classList.remove('hover');
         });
       });
 
@@ -242,20 +198,18 @@
       let createButton = document.getElementById('button');
       createButton.addEventListener('click', function () {
         // Create the hex file and download it
-        if (!v1HexStr || !v2HexStr) {
-          let errorMsg = 'Must have both hex files loaded first.';
+        if (!uHexStr) {
+          let errorMsg = 'Must have have a Universal Hex file loaded first.';
           console.error(errorMsg);
           return alert(errorMsg);
         }
         try {
-          let universalHex = microbitUh.createUniversalHex([{
-              hex: v1HexStr,
-              boardId: 0x9900,
-            }, {
-              hex: v2HexStr,
-              boardId: 0x9903,
-          }]);
-          downloadTextFile('universal-hex.hex', universalHex);
+          if (microbitUh.isUniversalHex(uHexStr)) {
+            var separatedBinaries = microbitUh.separateUniversalHex(uHexStr);
+          }
+          separatedBinaries.forEach(function (hexObj) {
+            downloadTextFile('ih-' + hexObj.boardId.toString(16) + '.hex', hexObj.hex);
+          });
         } catch (e) {
           alert(e);
         }

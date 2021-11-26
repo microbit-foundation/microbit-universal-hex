@@ -35,6 +35,10 @@ generate a Universal Hex from two Intel Hex files.
 It can be accessed online on this URL:
 https://tech.microbit.org/software/universal-hex-creator/
 
+There is also an example showing the reverse process of separating a Universal
+Hex into individual Intel Hex files:
+https://microbit-foundation.github.io/microbit-universal-hex/examples/separate.html
+
 ## License
 
 This software is under the MIT open source license.
