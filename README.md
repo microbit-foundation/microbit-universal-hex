@@ -26,7 +26,7 @@ npm install @microbit/microbit-universal-hex
 
 ## Web Tool
 
-<img width="18%" alt="microbit-universal-hex logo" src="docs/img/web-tool-screenshot.png" align="left">
+<img width="30%" alt="microbit-universal-hex logo" src="docs/img/web-tool-screenshot.png" align="left">
 
 An implementation example can be found in the
 [docs/examples/webtool.html](docs/examples/webtool.html) file. This web tool can
