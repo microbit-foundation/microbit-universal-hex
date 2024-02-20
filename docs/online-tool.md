@@ -15,4 +15,6 @@ V1 and an Intel Hex file for micro:bit V2.
 
 [Click here to go to the Universal Hex Creator](https://tech.microbit.org/software/universal-hex-creator/){: .btn .btn-purple }
 
+[Click here to go to the Universal Hex Separator](https://microbit-foundation.github.io/microbit-universal-hex/examples/separate.html){: .btn }
+
 ![Online Tool screenshot](img/web-tool-screenshot.png)
