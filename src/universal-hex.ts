@@ -19,6 +19,7 @@
 import * as ihex from './ihex';
 
 const V1_BOARD_IDS = [0x9900, 0x9901];
+const V2_BOARD_IDS = [0x9903, 0x9904, 0x9905, 0x9906];
 const BLOCK_SIZE = 512;
 
 /**
@@ -490,6 +491,8 @@ function separateUniversalHex(universalHexStr: string): IndividualHex[] {
 }
 
 export {
+  V1_BOARD_IDS,
+  V2_BOARD_IDS,
   microbitBoardId,
   IndividualHex,
   iHexToCustomFormatBlocks,
