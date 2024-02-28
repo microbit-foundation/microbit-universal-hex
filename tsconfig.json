@@ -20,7 +20,7 @@
     "outDir": "dist/esm5",
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": false,
-    "importHelpers": true
+    "importHelpers": false
   },
   "include": [
     "./src"
