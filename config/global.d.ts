@@ -5,9 +5,8 @@
 // ============================
 // Rollup plugins without types
 // ============================
-type RollupPluginImpl<O extends object = object> = import('rollup').PluginImpl<
-  O
->;
+type RollupPluginImpl<O extends object = object> =
+  import('rollup').PluginImpl<O>;
 
 declare module 'rollup-plugin-sourcemaps' {
   const plugin: RollupPluginImpl;

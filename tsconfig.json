@@ -19,6 +19,7 @@
     "declarationDir": "dist/types",
     "outDir": "dist/esm5",
     "resolveJsonModule": true,
+    "useUnknownInCatchVariables": false,
     "importHelpers": true
   },
   "include": [
