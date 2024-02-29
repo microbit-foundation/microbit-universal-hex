@@ -46,14 +46,11 @@
     "lint:fix": "npm run lint -- --fix",
     "docs": "typedoc --options config/typedoc.json"
   },
-  "dependencies": {},
-  "peerDependencies": {},
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.23.9",
     "@rollup/plugin-commonjs": "^25.0.7",
-    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.21",

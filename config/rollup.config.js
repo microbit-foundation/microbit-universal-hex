@@ -1,16 +1,12 @@
 import { resolve } from 'path';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import nodeResolve from '@rollup/plugin-node-resolve';
-import json from '@rollup/plugin-json';
 import commonjs from '@rollup/plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import minify from 'rollup-plugin-babel-minify';
 
 import pkg from '../package.json';
 
-/**
- * @typedef {import('./types').RollupConfig} Config
- */
 /**
  * @typedef {import('./types').RollupPlugin} Plugin
  */
@@ -23,13 +19,12 @@ const dist = resolve(root, 'dist');
  *
  * @type {string[]}
  */
-const external = Object.keys(pkg.peerDependencies) || [];
+const external = [];
 
 /**
  *  @type {Plugin[]}
  */
 const plugins = /** @type {Plugin[]} */ ([
-  json(),
   commonjs(),
   // Allow node_modules resolution.  Use 'external' to control
   // which external modules to include in the bundle
