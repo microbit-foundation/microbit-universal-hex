@@ -1,4 +1,5 @@
 import { resolve } from 'path';
+import builtins from 'builtin-modules';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
@@ -28,7 +29,7 @@ const plugins = /** @type {Plugin[]} */ ([
   commonjs(),
   // Allow node_modules resolution.  Use 'external' to control
   // which external modules to include in the bundle
-  // https://github.com/rollup/rollup-plugin-node-resolve#usage
+  // https://github.com/rollup/plugins/blob/master/packages/node-resolve/
   nodeResolve(),
   sourceMaps(),
   babel({
@@ -99,4 +100,18 @@ const umdConfigMin = createUmdConfig({
   ],
 });
 
-export default [umdConfig, umdConfigMin];
+const cjsConfigCli = {
+  inlineDynamicImports: true,
+  external: [...external, ...Object.keys(pkg.dependencies), ...builtins],
+  input: resolve(dist, 'esm5', 'cli.js'),
+  output: {
+    banner: '#!/usr/bin/env node',
+    file: pkg.bin.uhex,
+    format: 'cjs',
+    name: pkg.config.umdName,
+    sourcemap: true,
+  },
+  plugins: [commonjs(), nodeResolve(), sourceMaps()],
+};
+
+export default [umdConfig, umdConfigMin, cjsConfigCli];
