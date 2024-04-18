@@ -2,7 +2,7 @@
 
 <img width="30%" alt="microbit-universal-hex logo" src="docs/img/microbit-uh-logo.png" align="right">
 
-[![CircleCI](https://circleci.com/gh/microbit-foundation/microbit-universal-hex.svg?style=svg)](https://circleci.com/gh/microbit-foundation/microbit-universal-hex)
+[![GitHub Actions](https://github.com/microbit-foundation/microbit-universal-hex/actions/workflows/build.yml/badge.svg)](https://github.com/microbit-foundation/microbit-universal-hex/actions/workflows/build.yml)
 
 TypeScript/JavaScript library to create micro:bit Universal Hex files for
 micro:bit.
