@@ -9,6 +9,9 @@
     "universal hex",
     "uh"
   ],
+  "bin": {
+    "uhex": "./dist/bundles/microbit-uh-cli.cjs.js"
+  },
   "main": "./dist/bundles/microbit-uh.umd.js",
   "mainMin": "./dist/bundles/microbit-uh.umd.min.js",
   "module": "./dist/esm5/index.js",
@@ -45,6 +48,9 @@
     "lint": "tslint --project tsconfig.json --format codeFrame",
     "lint:fix": "npm run lint -- --fix",
     "docs": "typedoc --options config/typedoc.json"
+  },
+  "dependencies": {
+    "commander": "^12.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
