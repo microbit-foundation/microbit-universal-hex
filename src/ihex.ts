@@ -193,7 +193,8 @@ function getRecordData(iHexRecord: string): Uint8Array {
   try {
     // The only thing after the Data bytes is the Checksum (2 characters)
     return utils.hexStrToBytes(iHexRecord.slice(DATA_STR_INDEX, -2));
-  } catch (e) {
+  } catch (err) {
+    const e = err as Error;
     throw new Error(
       `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
     );
@@ -211,7 +212,8 @@ function parseRecord(iHexRecord: string): Record {
   let recordBytes;
   try {
     recordBytes = utils.hexStrToBytes(iHexRecord.substring(1));
-  } catch (e) {
+  } catch (err) {
+    const e = err as Error;
     throw new Error(
       `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
     );

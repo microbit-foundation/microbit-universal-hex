@@ -1,29 +1,22 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "esnext",
-    "target": "es5",
-    "lib": [
-      "dom",
-      "es2018"
-    ],
-    "strict": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
+    "target": "ES2021",
+    "useDefineForClassFields": true,
+    "module": "NodeNext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "outDir": "dist/esm",
     "sourceMap": true,
-    "stripInternal": true,
     "declaration": true,
-    "declarationMap": true,
-    "declarationDir": "dist/types",
-    "outDir": "dist/esm5",
-    "resolveJsonModule": true,
-    "useUnknownInCatchVariables": false,
-    "importHelpers": false
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    /* Temporarily disabled */
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "./src"
-  ],
+  "include": ["./src"],
   "compileOnSave": false
 }

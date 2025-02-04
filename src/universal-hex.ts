@@ -491,7 +491,7 @@ function separateUniversalHex(universalHexStr: string): IndividualHex[] {
 
 export {
   microbitBoardId,
-  IndividualHex,
+  type IndividualHex,
   iHexToCustomFormatBlocks,
   iHexToCustomFormatSection,
   createUniversalHex,
