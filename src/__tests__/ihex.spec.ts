@@ -311,7 +311,7 @@ describe('Test parseRecord() for standard records', () => {
   // TODO: Add tests for parsing BlockStart records
 });
 
-describe('Test parseRecord() for custom records', () => {
+describe.skip('Test parseRecord() for custom records', () => {
   // TODO: Add tests for parsing BlockStart records
   // TODO: Add tests for parsing BlockEnd records
   // TODO: Add tests for parsing PaddedData records
