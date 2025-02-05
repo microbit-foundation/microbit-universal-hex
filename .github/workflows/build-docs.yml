@@ -4,9 +4,9 @@ on:
     types: [created]
   push:
     branches:
-      - "**"
+      - '**'
     tags:
-      - "**"
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
