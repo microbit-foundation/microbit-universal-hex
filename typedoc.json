@@ -10,8 +10,6 @@
   "projectDocuments": [
     // Order as per left nav
     "./docs/quick-guide.md",
-    "./docs/uh-format.md",
-    "./docs/online-tool.md",
     "./docs/contributing.md"
   ],
   "readme": "./docs/index.md",
