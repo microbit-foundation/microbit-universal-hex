@@ -32,6 +32,8 @@ const universalHex = microbitUh.createUniversalHex([
 ]);
 ```
 
+See [Universal Hex Creator demo](./examples/webtool.html) for example.
+
 Separate a Universal Hex into its Intel Hex strings, use {@link separateUniversalHex}
 
 ```js
@@ -45,3 +47,5 @@ if (microbitUh.isUniversalHex(intelHexStr)) {
   });
 }
 ```
+
+See [Universal Hex Splitter demo](./examples/separate.html) for example.

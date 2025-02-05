@@ -18,6 +18,8 @@ Create Universal Hex files for the micro:bit.
   library.
 - [The micro:bit Tech Site](https://tech.microbit.org) contains general technical information about the
   micro:bit.
+- [Universal Hex Creator demo](./examples/webtool.html)
+- [Universal Hex Splitter demo](./examples/separate.html)
 
 ---
 
