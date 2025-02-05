@@ -10,7 +10,6 @@ tslint.json
 **/prettier.config.js
 
 # build scripts
-config/
 scripts/
 
 # Test files
