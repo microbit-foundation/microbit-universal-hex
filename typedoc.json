@@ -1,0 +1,20 @@
+{
+  "name": "micro:bit universal hex",
+  "navigationLinks": {
+    "Universal hex spec": "https://github.com/microbit-foundation/spec-universal-hex/",
+    "micro:bit tech site": "https://tech.microbit.org",
+    "GitHub": "https://github.com/microbit-foundation/microbit-universal-hex"
+  },
+  "entryPoints": ["./src/index.ts"],
+  "out": "./docs/build",
+  "projectDocuments": [
+    // Order as per left nav
+    "./docs/quick-guide.md",
+    "./docs/uh-format.md",
+    "./docs/online-tool.md",
+    "./docs/contributing.md"
+  ],
+  "readme": "./docs/index.md",
+  "headings": { "readme": false },
+  "customFooterHtml": "<p>Copyright 2020 Micro:bit Educational Foundation and project contributors. Distributed under the <a href='https://github.com/microbit-foundation/microbit-universal-hex/blob/master/LICENSE.md'>MIT open source license</a>.<p>"
+}

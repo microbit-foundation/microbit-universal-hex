@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Universal Hex Format
-nav_order: 4
 ---
 
 # Universal Hex Format
