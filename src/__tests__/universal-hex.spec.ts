@@ -1263,15 +1263,15 @@ describe('Test createUniversalHex()', () => {
       ':10009000678E01000D8A0100D98A0100A5E90000E0\n' +
       ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5\n' +
       ':00000001FF\n';
-    // const microbitV1MakecodeV0 =
-    //   ':020000040000FA\n' +
-    //   ':1000000000400020218E01005D8E01005F8E010006\n' +
-    //   ':1000100000000000000000000000000000000000E0\n' +
-    //   ':020000042000DA\n' +
-    //   ':1000000041140E2FB82FA2BB9A005F02000000001F\n' +
-    //   ':100010007B22636F6D7072657373696F6E223A2213\n' +
-    //   ':00000001FF\n' +
-    //   '\n';
+    const microbitV1MakecodeV0 =
+      ':020000040000FA\n' +
+      ':1000000000400020218E01005D8E01005F8E010006\n' +
+      ':1000100000000000000000000000000000000000E0\n' +
+      ':020000042000DA\n' +
+      ':1000000041140E2FB82FA2BB9A005F02000000001F\n' +
+      ':100010007B22636F6D7072657373696F6E223A2213\n' +
+      ':00000001FF\n' +
+      '\n';
     const microbitV1MakecodeV1 =
       ':020000040000FA\n' +
       ':1000000000400020218E01005D8E01005F8E010006\n' +
@@ -1295,15 +1295,17 @@ describe('Test createUniversalHex()', () => {
       '\n' +
       '\n';
 
-    // const failFirstV0Blocks = () => {
-    //   uh.createUniversalHex(
-    //     [
-    //       { hex: microbitV1MakecodeV0, boardId: 0x9900 },
-    //       { hex: normalHex, boardId: 0x9903 },
-    //     ],
-    //     true
-    //   );
-    // };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const failFirstV0Blocks = () => {
+      uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV0, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
     const failFirstV1Blocks = () => {
       uh.createUniversalHex(
         [
@@ -1322,15 +1324,17 @@ describe('Test createUniversalHex()', () => {
         true
       );
     };
-    // const failFirstV0Sections = () => {
-    //   uh.createUniversalHex(
-    //     [
-    //       { hex: microbitV1MakecodeV0, boardId: 0x9900 },
-    //       { hex: normalHex, boardId: 0x9903 },
-    //     ],
-    //     false
-    //   );
-    // };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const failFirstV0Sections = () => {
+      uh.createUniversalHex(
+        [
+          { hex: microbitV1MakecodeV0, boardId: 0x9900 },
+          { hex: normalHex, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
     const failFirstV1Sections = () => {
       uh.createUniversalHex(
         [
@@ -1349,15 +1353,17 @@ describe('Test createUniversalHex()', () => {
         false
       );
     };
-    // const failSecondV0Blocks = () => {
-    //   uh.createUniversalHex(
-    //     [
-    //       { hex: normalHex, boardId: 0x9900 },
-    //       { hex: microbitV1MakecodeV0, boardId: 0x9903 },
-    //     ],
-    //     true
-    //   );
-    // };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const failSecondV0Blocks = () => {
+      uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV0, boardId: 0x9903 },
+        ],
+        true
+      );
+    };
     const failSecondV1Blocks = () => {
       uh.createUniversalHex(
         [
@@ -1376,15 +1382,17 @@ describe('Test createUniversalHex()', () => {
         true
       );
     };
-    // const failSecondV0Sections = () => {
-    //   uh.createUniversalHex(
-    //     [
-    //       { hex: normalHex, boardId: 0x9900 },
-    //       { hex: microbitV1MakecodeV0, boardId: 0x9903 },
-    //     ],
-    //     false
-    //   );
-    // };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const failSecondV0Sections = () => {
+      uh.createUniversalHex(
+        [
+          { hex: normalHex, boardId: 0x9900 },
+          { hex: microbitV1MakecodeV0, boardId: 0x9903 },
+        ],
+        false
+      );
+    };
     const failSecondV1Sections = () => {
       uh.createUniversalHex(
         [
