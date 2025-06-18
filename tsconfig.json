@@ -17,6 +17,5 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["./src"],
-  "compileOnSave": false
+  "include": ["src"]
 }

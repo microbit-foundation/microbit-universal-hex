@@ -10,8 +10,8 @@
     "uh"
   ],
   "main": "./dist/cjs/index.js",
-  "module": "./dist/esm5/index.js",
-  "typings": "./dist/types/index.d.ts",
+  "module": "./dist/esm/index.js",
+  "typings": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
       "import": {
@@ -28,9 +28,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/microbit-foundation/microbit-universal-hex"
-  },
-  "config": {
-    "umdName": "microbitUh"
   },
   "author": "Micro:bit Educational Foundation <package-help@microbit.org>",
   "license": "MIT",
