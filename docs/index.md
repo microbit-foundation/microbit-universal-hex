@@ -39,9 +39,9 @@ micro:bit Universal Hex from two or more micro:bit Intel Hex files.
 This [Universal Hex Creator web tool](https://tech.microbit.org/software/universal-hex-creator/) can
 generate a Universal Hex from two Intel Hex files (one for micro:bit V1 and another for micro:bit V2).
 
-An implementation example can be found in the [webtool.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html) file, which produces this [Universal Hex Creator demo](./examples/webtool.html).
+Implementation for [Universal Hex Creator demo](./examples/webtool.html) can be found in [webtool.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html) file.
 
-An implementation example showing the reverse process of separating a Universal Hex into individual Intel Hex files can be found in the [seperate.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html) file. It produces this [Universal Hex Separator demo](./examples/separate.html).
+Implementation example for [Universal Hex Separator demo](./examples/separate.html) can be found in the [seperate.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html) file.
 
 ## Related documentation
 

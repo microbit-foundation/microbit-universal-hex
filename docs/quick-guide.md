@@ -17,6 +17,8 @@ npm install @microbit/microbit-universal-hex
 
 To create a Universal Hex from two Intel Hex strings, use {@link createUniversalHex}.
 
+Implementation for [Universal Hex Creator demo](./examples/webtool.html) can be found in [webtool.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html) file.
+
 ```js
 import * as microbitUh from '@microbit/microbit-universal-hex';
 
@@ -32,9 +34,9 @@ const universalHex = microbitUh.createUniversalHex([
 ]);
 ```
 
-See [Universal Hex Creator demo](./examples/webtool.html) for example.
+To separate a Universal Hex into its Intel Hex strings, use {@link separateUniversalHex}.
 
-Separate a Universal Hex into its Intel Hex strings, use {@link separateUniversalHex}
+Implementation example for [Universal Hex Separator demo](./examples/separate.html) can be found in the [seperate.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html) file.
 
 ```js
 import * as microbitUh from '@microbit/microbit-universal-hex';
