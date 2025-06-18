@@ -1,25 +1,28 @@
 ---
 layout: default
 title: Quick Guide
-nav_order: 2
 ---
 
 # Quick Guide
 
-## ES5 UMD Bundle
+## npm package
 
-Download the UMD bundle from the
-[latest GitHub release](https://github.com/microbit-foundation/microbit-universal-hex/releases/latest)
-and add it to the page:
+You can integrate this library in your project using the [npm package](https://www.npmjs.com/package/@microbit/microbit-universal-hex):
 
-```html
-<script src="microbit-uh.umd.min.js"></script>
+```bash
+npm install @microbit/microbit-universal-hex
 ```
 
-Then to create a Universal Hex from two Intel Hex strings:
+## Usage
+
+To create a Universal Hex from two Intel Hex strings, use {@link createUniversalHex}.
+
+Implementation for [Universal Hex Creator demo](./examples/webtool.html) can be found in [webtool.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html) file.
 
 ```js
-var universalHex = microbitUh.createUniversalHex([
+import * as microbitUh from '@microbit/microbit-universal-hex';
+
+const universalHex = microbitUh.createUniversalHex([
   {
     hex: intelHexStringV1,
     boardId: microbitUh.microbitBoardId.V1,
@@ -31,21 +34,20 @@ var universalHex = microbitUh.createUniversalHex([
 ]);
 ```
 
-Separate a Universal Hex into its Intel Hex strings:
+To separate a Universal Hex into its Intel Hex strings, use {@link separateUniversalHex}.
+
+Implementation example for [Universal Hex Separator demo](./examples/separate.html) can be found in the [seperate.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html) file.
 
 ```js
+import * as microbitUh from '@microbit/microbit-universal-hex';
+
 if (microbitUh.isUniversalHex(intelHexStr)) {
-  var separatedBinaries = microbitUh.separateUniversalHex(intelHexStr);
+  const separatedBinaries = microbitUh.separateUniversalHex(intelHexStr);
+  separatedBinaries.forEach(function (hexObj) {
+    console.log(hexObj.boardId);
+    console.log(hexObj.hex);
+  });
 }
-separatedBinaries.forEach(function (hexObj) {
-  console.log(hexObj.boardId);
-  console.log(hexObj.hex);
-});
 ```
 
-## npm package
-
-You can integrate this library in your project using the npm package:
-[https://www.npmjs.com/package/@microbit/microbit-universal-hex](https://www.npmjs.com/package/@microbit/microbit-universal-hex)
-
-For information on how to use this library check the API documentation.
+See [Universal Hex Splitter demo](./examples/separate.html) for example.

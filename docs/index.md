@@ -8,34 +8,55 @@ nav_order: 1
 
 # micro:bit Universal Hex
 
-{: .fs-9 }
+<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" width="300px">
 
-<img alt="microbit-universal-hex logo" src="img/microbit-uh-logo.png" style="max-height: 160px; float: left; padding-right: 16px;">
+## Introduction
 
 Create Universal Hex files for the micro:bit.
-{: .fs-6 .fw-300 }
-
-[Quick Guide](quick-guide.html){: .btn .btn-primary .mb-4 .mb-md-0 .mr-2 }
-[API](api/){: .btn .btn-purple .mb-4 .mb-md-0 .mr-2 }
-[View it on GitHub](https://github.com/microbit-foundation/microbit-universal-hex/){: .btn .mb-4 .mb-md-0 }
-
-<br>
-
----
 
 This is the documentation for the micro:bit Universal Hex library.
 
-Originally the micro:bit hex files used the
-[Intel Hex format](https://en.wikipedia.org/wiki/Intel_HEX) and with the
-micro:bit V2 release a new hex format was created to be able to flash any
-micro:bit board version with a single file.
+Here you will find the available public API to convert Intel Hex strings into Universal Hex strings and vice-versa.
 
-The Universal Hex file format can contain the binary data for multiple micro:bit
-board versions and this TypeScript/JavaScript library can be used to create a
+## Getting started
+
+Read the [Quick guide](quick-guide.md).
+
+## Universal Hex format
+
+The micro:bit Universal Hex format is a superset of the
+[Intel Hex file format](https://en.wikipedia.org/wiki/Intel_HEX) designed to be
+able to include data for multiple targets into a single file. A Universal Hex file can contain the binary data for multiple micro:bit
+board versions. This allows the creation of a hex file that will work on micro:bit V1 and V2.
+
+Detailed information of the Universal Hex format can be found in the [specification](https://github.com/microbit-foundation/spec-universal-hex).
+
+This TypeScript/JavaScript library can be used to create a
 micro:bit Universal Hex from two or more micro:bit Intel Hex files.
 
-## Navigation
+## Web tool
 
-- ⬆️ The header at the top contains a search bar
-- ⬅️ The menu on the left shows you the available documentation pages
-- ⬇️ If you'd like to contribute to the docs there is an edit link at the footer
+This [Universal Hex Creator web tool](https://tech.microbit.org/software/universal-hex-creator/) can
+generate a Universal Hex from two Intel Hex files (one for micro:bit V1 and another for micro:bit V2).
+
+Implementation for [Universal Hex Creator demo](./examples/webtool.html) can be found in [webtool.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html) file.
+
+Implementation example for [Universal Hex Separator demo](./examples/separate.html) can be found in the [seperate.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html) file.
+
+## Related documentation
+
+- [micro:bit Universal Hex Specification](https://github.com/microbit-foundation/spec-universal-hex) contains a lot more information
+  about the file data format.
+
+- [GitHub](https://microbit-foundation.github.io/microbit-universal-hex/) contains general documentation for this
+  library.
+
+- [The micro:bit Tech Site](https://tech.microbit.org) contains general technical information about the micro:bit.
+
+## License
+
+This documentation, as well as the rest of the source files located in the
+https://github.com/microbit-foundation/microbit-universal-hex repository, is
+released under the MIT open source license.
+
+SPDX-License-Identifier: MIT

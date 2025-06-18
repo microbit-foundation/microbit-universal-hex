@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 import * as fs from 'fs';
-
+import { expect, describe, it } from 'vitest';
 import * as uh from '../universal-hex';
 
 const hexPath = './src/__tests__/hex-files/';
@@ -1125,7 +1125,7 @@ describe('Test createUniversalHex()', () => {
     );
 
     const failFirstBlocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHexEof10, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1134,13 +1134,13 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failFirstSections = () => {
-      const result = uh.createUniversalHex([
+      uh.createUniversalHex([
         { hex: normalHexEof10, boardId: 0x9900 },
         { hex: normalHex, boardId: 0x9903 },
       ]);
     };
     const failSecondBlocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: normalHexEof12, boardId: 0x9903 },
@@ -1149,7 +1149,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondSections = () => {
-      const result = uh.createUniversalHex([
+      uh.createUniversalHex([
         { hex: normalHex, boardId: 0x9900 },
         { hex: normalHexEof12, boardId: 0x9903 },
       ]);
@@ -1201,7 +1201,7 @@ describe('Test createUniversalHex()', () => {
       ':00000001FF\n';
 
     const failFirstBlocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: universalHex, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1210,7 +1210,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failFirstSections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: universalHex, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1219,7 +1219,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondBlocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: universalHex, boardId: 0x9903 },
@@ -1228,7 +1228,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondSections = () => {
-      const result = uh.createUniversalHex([
+      uh.createUniversalHex([
         { hex: normalHex, boardId: 0x9900 },
         { hex: universalHex, boardId: 0x9903 },
       ]);
@@ -1295,8 +1295,10 @@ describe('Test createUniversalHex()', () => {
       '\n' +
       '\n';
 
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failFirstV0Blocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: microbitV1MakecodeV0, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1305,7 +1307,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failFirstV1Blocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: microbitV1MakecodeV1, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1314,7 +1316,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failFirstV2Blocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: microbitV1MakecodeV2, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1322,8 +1324,10 @@ describe('Test createUniversalHex()', () => {
         true
       );
     };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failFirstV0Sections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: microbitV1MakecodeV0, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1332,7 +1336,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failFirstV1Sections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: microbitV1MakecodeV1, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1341,7 +1345,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failFirstV2Sections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: microbitV1MakecodeV2, boardId: 0x9900 },
           { hex: normalHex, boardId: 0x9903 },
@@ -1349,8 +1353,10 @@ describe('Test createUniversalHex()', () => {
         false
       );
     };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failSecondV0Blocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: microbitV1MakecodeV0, boardId: 0x9903 },
@@ -1359,7 +1365,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondV1Blocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: microbitV1MakecodeV1, boardId: 0x9903 },
@@ -1368,7 +1374,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondV2Blocks = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: microbitV1MakecodeV2, boardId: 0x9903 },
@@ -1376,8 +1382,10 @@ describe('Test createUniversalHex()', () => {
         true
       );
     };
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failSecondV0Sections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: microbitV1MakecodeV0, boardId: 0x9903 },
@@ -1386,7 +1394,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondV1Sections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: microbitV1MakecodeV1, boardId: 0x9903 },
@@ -1395,7 +1403,7 @@ describe('Test createUniversalHex()', () => {
       );
     };
     const failSecondV2Sections = () => {
-      const result = uh.createUniversalHex(
+      uh.createUniversalHex(
         [
           { hex: normalHex, boardId: 0x9900 },
           { hex: microbitV1MakecodeV2, boardId: 0x9903 },
@@ -1602,7 +1610,7 @@ describe('Test isUniversalHex()', () => {
 describe('Separate a Universal Hex', () => {
   it('Throws an error on empty input', () => {
     expect(() => {
-      const result = uh.separateUniversalHex('');
+      uh.separateUniversalHex('');
     }).toThrow('Empty');
   });
 

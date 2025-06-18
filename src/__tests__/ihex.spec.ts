@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 import * as ihex from '../ihex';
+import { expect, describe, it } from 'vitest';
 
 describe('Test createRecord() for standard records', () => {
   it('Creates standard data records', () => {
@@ -88,7 +89,7 @@ describe('Test createRecord() for standard records', () => {
 
   it('Throws error when the record is invalid', () => {
     expect(() => {
-      ihex.createRecord(0, 0xff, new Uint8Array([]));
+      ihex.createRecord(0, 0xff as ihex.RecordType, new Uint8Array([]));
     }).toThrow('is not valid');
   });
 });
@@ -310,7 +311,7 @@ describe('Test parseRecord() for standard records', () => {
   // TODO: Add tests for parsing BlockStart records
 });
 
-describe('Test parseRecord() for custom records', () => {
+describe.skip('Test parseRecord() for custom records', () => {
   // TODO: Add tests for parsing BlockStart records
   // TODO: Add tests for parsing BlockEnd records
   // TODO: Add tests for parsing PaddedData records
@@ -672,7 +673,7 @@ describe('Test findDataFieldLength()', () => {
       ':00000001FF',
     ];
     const throwsError = () => {
-      const recordLength = ihex.findDataFieldLength(records);
+      ihex.findDataFieldLength(records);
     };
 
     expect(throwsError).toThrow('data size is too large');

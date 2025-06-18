@@ -193,7 +193,8 @@ function getRecordData(iHexRecord: string): Uint8Array {
   try {
     // The only thing after the Data bytes is the Checksum (2 characters)
     return utils.hexStrToBytes(iHexRecord.slice(DATA_STR_INDEX, -2));
-  } catch (e) {
+  } catch (err) {
+    const e = err as Error;
     throw new Error(
       `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
     );
@@ -211,7 +212,8 @@ function parseRecord(iHexRecord: string): Record {
   let recordBytes;
   try {
     recordBytes = utils.hexStrToBytes(iHexRecord.substring(1));
-  } catch (e) {
+  } catch (err) {
+    const e = err as Error;
     throw new Error(
       `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
     );
@@ -313,10 +315,11 @@ function blockEndRecord(padBytesLen: number): string {
     case 0x0c:
       // The most common padding, when a block has 10 full (0x10) Data records
       return ':0C00000BFFFFFFFFFFFFFFFFFFFFFFFFF5';
-    default:
+    default: {
       // Input sanitation will be done in createRecord, no need to do it here too
       const recordData = new Uint8Array(padBytesLen).fill(0xff);
       return createRecord(0, RecordType.BlockEnd, recordData);
+    }
   }
 }
 

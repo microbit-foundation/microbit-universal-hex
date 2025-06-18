@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: MIT
  */
 import * as utils from '../utils';
+import { expect, describe, it } from 'vitest';
 
 describe('Test hexStrToBytes()', () => {
   it('Converts hexadecimal string to a Uint8Array', () => {
