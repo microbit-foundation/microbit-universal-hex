@@ -2,9 +2,10 @@
   "compilerOptions": {
     "target": "ES2021",
     "useDefineForClassFields": true,
-    "module": "NodeNext",
+    "module": "esnext",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "moduleResolution": "node10",
     "isolatedModules": true,
     "moduleDetection": "force",
     "outDir": "dist/esm",
