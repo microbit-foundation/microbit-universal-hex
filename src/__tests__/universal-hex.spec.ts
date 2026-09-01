@@ -1295,7 +1295,7 @@ describe('Test createUniversalHex()', () => {
       '\n' +
       '\n';
 
-    // @ts-expect-error
+    // @ts-expect-error unused as its V0 expectation below is disabled
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failFirstV0Blocks = () => {
       uh.createUniversalHex(
@@ -1324,7 +1324,7 @@ describe('Test createUniversalHex()', () => {
         true
       );
     };
-    // @ts-expect-error
+    // @ts-expect-error unused as its V0 expectation below is disabled
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failFirstV0Sections = () => {
       uh.createUniversalHex(
@@ -1353,7 +1353,7 @@ describe('Test createUniversalHex()', () => {
         false
       );
     };
-    // @ts-expect-error
+    // @ts-expect-error unused as its V0 expectation below is disabled
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failSecondV0Blocks = () => {
       uh.createUniversalHex(
@@ -1382,7 +1382,7 @@ describe('Test createUniversalHex()', () => {
         true
       );
     };
-    // @ts-expect-error
+    // @ts-expect-error unused as its V0 expectation below is disabled
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const failSecondV0Sections = () => {
       uh.createUniversalHex(
