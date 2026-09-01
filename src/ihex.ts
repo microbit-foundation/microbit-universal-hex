@@ -196,7 +196,8 @@ function getRecordData(iHexRecord: string): Uint8Array {
   } catch (err) {
     const e = err as Error;
     throw new Error(
-      `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
+      `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`,
+      { cause: err }
     );
   }
 }
@@ -215,7 +216,8 @@ function parseRecord(iHexRecord: string): Record {
   } catch (err) {
     const e = err as Error;
     throw new Error(
-      `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`
+      `Could not parse Intel Hex record "${iHexRecord}": ${e.message}`,
+      { cause: err }
     );
   }
   const byteCountIndex = 0;
