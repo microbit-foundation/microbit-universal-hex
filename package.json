@@ -15,11 +15,11 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/esm/index.d.js",
+        "types": "./dist/esm/index.d.ts",
         "default": "./dist/esm/index.js"
       },
       "require": {
-        "types": "./dist/cjs/index.d.js",
+        "types": "./dist/cjs/index.d.ts",
         "default": "./dist/cjs/index.js"
       }
     }
@@ -31,11 +31,6 @@
   },
   "author": "Micro:bit Educational Foundation <package-help@microbit.org>",
   "license": "MIT",
-  "engines": {
-    "node": ">=8.5",
-    "npm": ">=9.0",
-    "yarn": "^1.0"
-  },
   "allowScripts": {
     "esbuild": true,
     "fsevents": true
