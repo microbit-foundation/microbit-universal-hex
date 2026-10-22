@@ -16,7 +16,7 @@
  * (c) 2020 Micro:bit Educational Foundation and the project contributors.
  * SPDX-License-Identifier: MIT
  */
-import * as ihex from './ihex';
+import * as ihex from './ihex.js';
 
 const V1_BOARD_IDS = [0x9900, 0x9901];
 const BLOCK_SIZE = 512;
