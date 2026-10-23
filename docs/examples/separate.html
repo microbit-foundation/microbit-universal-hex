@@ -142,7 +142,12 @@
       <button id="button">Split Universal Hex</button>
     </div>
 
-    <script type="text/javascript" src="microbit-uh.umd.min.js"></script>
+    <!--
+      microbit-uh.js is a browser bundle built for these simple demos and is not
+      a supported distribution of the library. For real apps we recommend
+      installing @microbit/microbit-universal-hex from npm and using a bundler.
+    -->
+    <script type="text/javascript" src="microbit-uh.js"></script>
 
     <script>
       let dropUhEl = document.getElementById('drop-uh');

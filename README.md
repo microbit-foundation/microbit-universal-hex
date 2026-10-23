@@ -24,20 +24,17 @@ To add this package to your project:
 npm install @microbit/microbit-universal-hex
 ```
 
-## Web Tool
+## Demos
 
-<img width="30%" alt="microbit-universal-hex logo" src="docs/img/web-tool-screenshot.png" align="left">
+<img width="30%" alt="Universal Hex Creator screenshot" src="docs/img/web-tool-screenshot.png" align="left">
 
-An implementation example can be found in the
-[docs/examples/webtool.html](docs/examples/webtool.html) file. This web tool can
-generate a Universal Hex from two Intel Hex files.
-
-It can be accessed online on this URL:
-https://tech.microbit.org/software/universal-hex-creator/
-
-There is also an example showing the reverse process of separating a Universal
-Hex into individual Intel Hex files:
-https://microbit-foundation.github.io/microbit-universal-hex/examples/separate.html
+- [Universal Hex Creator](https://microbit-foundation.github.io/microbit-universal-hex/examples/webtool.html)
+  ([source](docs/examples/webtool.html)) creates a Universal Hex from two Intel
+  Hex files. It is also available on the
+  [micro:bit tech site](https://tech.microbit.org/software/universal-hex-creator/).
+- [Universal Hex Splitter](https://microbit-foundation.github.io/microbit-universal-hex/examples/separate.html)
+  ([source](docs/examples/separate.html)) splits a Universal Hex into its Intel
+  Hex files.
 
 ## License
 

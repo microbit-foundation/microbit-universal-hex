@@ -4,4 +4,4 @@
  * (c) 2020 Micro:bit Educational Foundation and contributors.
  * SPDX-License-Identifier: MIT
  */
-export * from './universal-hex';
+export * from './universal-hex.js';

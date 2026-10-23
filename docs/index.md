@@ -34,14 +34,10 @@ Detailed information of the Universal Hex format can be found in the [specificat
 This TypeScript/JavaScript library can be used to create a
 micro:bit Universal Hex from two or more micro:bit Intel Hex files.
 
-## Web tool
+## Demos
 
-This [Universal Hex Creator web tool](https://tech.microbit.org/software/universal-hex-creator/) can
-generate a Universal Hex from two Intel Hex files (one for micro:bit V1 and another for micro:bit V2).
-
-Implementation for [Universal Hex Creator demo](./examples/webtool.html) can be found in [webtool.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html) file.
-
-Implementation example for [Universal Hex Separator demo](./examples/separate.html) can be found in the [seperate.html](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html) file.
+- [Universal Hex Creator](https://microbit-foundation.github.io/microbit-universal-hex/examples/webtool.html) ([source](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/webtool.html)) creates a Universal Hex from two Intel Hex files (one for micro:bit V1 and another for micro:bit V2). It is also available on the [micro:bit tech site](https://tech.microbit.org/software/universal-hex-creator/).
+- [Universal Hex Splitter](https://microbit-foundation.github.io/microbit-universal-hex/examples/separate.html) ([source](https://github.com/microbit-foundation/microbit-universal-hex/blob/main/docs/examples/separate.html)) splits a Universal Hex into its Intel Hex files.
 
 ## Related documentation
 

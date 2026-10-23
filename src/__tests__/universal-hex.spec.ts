@@ -6,7 +6,7 @@
  */
 import * as fs from 'fs';
 import { expect, describe, it } from 'vitest';
-import * as uh from '../universal-hex';
+import * as uh from '../universal-hex.js';
 
 const hexPath = './src/__tests__/hex-files/';
 const hex116 = fs.readFileSync(hexPath + '1-duck-umbrella-16.hex', 'utf8');

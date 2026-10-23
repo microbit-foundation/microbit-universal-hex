@@ -42,11 +42,13 @@
     "lint": "eslint . --max-warnings 0",
     "ci": "npm run build && npm run test && npm run lint && prettier --check .",
     "test": "vitest",
-    "docs": "typedoc --options typedoc.json"
+    "docs": "typedoc --options typedoc.json && npm run docs:examples",
+    "docs:examples": "esbuild src/index.ts --bundle --format=iife --global-name=microbitUh --minify --sourcemap --outfile=docs/build/examples/microbit-uh.js && cp docs/examples/*.html docs/build/examples/"
   },
   "devDependencies": {
     "@microbit/eslint-config": "^0.2.1",
     "@types/node": "^22.13.1",
+    "esbuild": "^0.28.2",
     "eslint": "^10.0.0",
     "prettier": "3.2.5",
     "typedoc": "0.28.20",

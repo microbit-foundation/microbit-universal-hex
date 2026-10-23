@@ -4,7 +4,7 @@
  * (c) 2020 Micro:bit Educational Foundation and contributors.
  * SPDX-License-Identifier: MIT
  */
-import * as ihex from '../ihex';
+import * as ihex from '../ihex.js';
 import { expect, describe, it } from 'vitest';
 
 describe('Test createRecord() for standard records', () => {

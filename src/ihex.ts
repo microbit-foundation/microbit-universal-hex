@@ -5,7 +5,7 @@
  * (c) 2020 Micro:bit Educational Foundation and contributors.
  * SPDX-License-Identifier: MIT
  */
-import * as utils from './utils';
+import * as utils from './utils.js';
 
 /** Values for the Record Type field, including Universal Hex custom types. */
 enum RecordType {
