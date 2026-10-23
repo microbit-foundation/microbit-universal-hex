@@ -1,6 +1,6 @@
 {
   "name": "@microbit/microbit-universal-hex",
-  "version": "0.2.2",
+  "version": "0.0.0-local",
   "description": "Create micro:bit universal hexes.",
   "homepage": "https://microbit-foundation.github.io/microbit-universal-hex/",
   "keywords": [
@@ -25,6 +25,10 @@
     }
   },
   "sideEffects": false,
+  "files": [
+    "dist",
+    "!dist/*/__tests__"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/microbit-foundation/microbit-universal-hex"
