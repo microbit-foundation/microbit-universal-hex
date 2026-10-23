@@ -26,8 +26,6 @@ npm install @microbit/microbit-universal-hex
 
 ## Demos
 
-<img width="30%" alt="Universal Hex Creator screenshot" src="docs/img/web-tool-screenshot.png" align="left">
-
 - [Universal Hex Creator](https://microbit-foundation.github.io/microbit-universal-hex/examples/webtool.html)
   ([source](docs/examples/webtool.html)) creates a Universal Hex from two Intel
   Hex files. It is also available on the
@@ -35,6 +33,8 @@ npm install @microbit/microbit-universal-hex
 - [Universal Hex Splitter](https://microbit-foundation.github.io/microbit-universal-hex/examples/separate.html)
   ([source](docs/examples/separate.html)) splits a Universal Hex into its Intel
   Hex files.
+
+[<img width="50%" alt="Universal Hex Creator screenshot" src="docs/img/web-tool-screenshot.png">](https://microbit-foundation.github.io/microbit-universal-hex/examples/webtool.html)
 
 ## License
 
